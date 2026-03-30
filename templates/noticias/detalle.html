@@ -1,0 +1,161 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ noticia.titulo }} - DINAPI{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <div class="container">
+        <h1>{{ noticia.titulo }}</h1>
+        <p class="mb-0">
+            <i class="fas fa-calendar"></i> {{ noticia.fecha|date:'d \de F \de Y' }}
+        </p>
+    </div>
+</div>
+
+<div class="container my-5">
+    <div class="row">
+        <!-- Contenido Principal -->
+        <div class="col-lg-8">
+            <article class="card shadow-sm mb-4">
+                {% if noticia.imagen %}
+                    <img src="{{ noticia.imagen.url }}" class="card-img-top" alt="{{ noticia.titulo }}">
+                {% endif %}
+                
+                <div class="card-body">
+                    <div class="mb-4">
+                        <span class="badge bg-primary">{{ noticia.categoria.nombre }}</span>
+                        {% if noticia.destacado %}
+                            <span class="badge bg-warning text-dark">
+                                <i class="fas fa-star"></i> Destacada
+                            </span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="noticia-contenido">
+                        {{ noticia.contenido|safe }}
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="text-muted">
+                        <p>
+                            <i class="fas fa-calendar"></i> Publicado: {{ noticia.fecha_creacion|date:'d/m/Y H:i' }}<br>
+                            <i class="fas fa-edit"></i> Actualizado: {{ noticia.fecha_modificacion|date:'d/m/Y H:i' }}
+                        </p>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Compartir -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h6 class="card-title">Compartir:</h6>
+                    <div class="d-flex gap-2">
+                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" 
+                           target="_blank" class="btn btn-sm btn-primary">
+                            <i class="fab fa-facebook"></i> Facebook
+                        </a>
+                        <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}&text={{ noticia.titulo }}" 
+                           target="_blank" class="btn btn-sm btn-info">
+                            <i class="fab fa-twitter"></i> Twitter
+                        </a>
+                        <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.build_absolute_uri }}" 
+                           target="_blank" class="btn btn-sm btn-dark">
+                            <i class="fab fa-linkedin"></i> LinkedIn
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Información Noticia -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-info-circle"></i> Información</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    <div class="list-group-item">
+                        <small class="text-muted">Categoría</small><br>
+                        <strong>{{ noticia.categoria.nombre }}</strong>
+                    </div>
+                    <div class="list-group-item">
+                        <small class="text-muted">Fecha</small><br>
+                        <strong>{{ noticia.fecha|date:'d/m/Y' }}</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Noticias Relacionadas -->
+            {% if noticias_relacionadas %}
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-link"></i> Noticias Relacionadas</h5>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        {% for noticia_rel in noticias_relacionadas %}
+                            <a href="{% url 'noticias:detalle' noticia_rel.slug %}" 
+                               class="list-group-item list-group-item-action">
+                                <small class="text-muted d-block">{{ noticia_rel.fecha|date:'d/m/Y' }}</small>
+                                <strong>{{ noticia_rel.titulo|truncatewords:8 }}</strong>
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Navegación -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <a href="{% url 'noticias:lista' %}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left"></i> Volver a noticias
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .noticia-contenido {
+        font-size: 1.1rem;
+        line-height: 1.8;
+    }
+    
+    .noticia-contenido img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+        margin: 20px 0;
+    }
+    
+    .noticia-contenido h2 {
+        color: var(--primary-color);
+        margin-top: 30px;
+        margin-bottom: 15px;
+        font-weight: bold;
+    }
+    
+    .noticia-contenido h3 {
+        color: var(--secondary-color);
+        margin-top: 20px;
+        margin-bottom: 10px;
+    }
+    
+    .noticia-contenido p {
+        margin-bottom: 15px;
+        text-align: justify;
+    }
+    
+    .noticia-contenido a {
+        color: var(--secondary-color);
+        text-decoration: none;
+        font-weight: 500;
+    }
+    
+    .noticia-contenido a:hover {
+        text-decoration: underline;
+    }
+</style>
+{% endblock %}

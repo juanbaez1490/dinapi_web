@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+
+{% block title %}Noticias - DINAPI{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <div class="container">
+        <h1><i class="fas fa-newspaper"></i> Noticias</h1>
+        <p>Mantente informado sobre las últimas novedades de propiedad intelectual</p>
+    </div>
+</div>
+
+<div class="container my-5">
+    <div class="row">
+        <!-- Sidebar Categorías y Búsqueda -->
+        <div class="col-lg-3 mb-4">
+            <div class="card shadow-sm mb-3">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-filter"></i> Categorías</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="{% url 'noticias:lista' %}" class="list-group-item list-group-item-action">
+                        Todas las noticias
+                    </a>
+                    {% for categoria in categorias %}
+                        <a href="?categoria={{ categoria.slug }}" class="list-group-item list-group-item-action">
+                            {{ categoria.nombre }}
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Noticias Destacadas -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-star"></i> Destacadas</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    {% for noticia in noticias_destacadas %}
+                        <a href="{% url 'noticias:detalle' noticia.slug %}" class="list-group-item list-group-item-action">
+                            <small class="text-muted d-block">{{ noticia.fecha|date:'d/m/Y' }}</small>
+                            <strong>{{ noticia.titulo }}</strong>
+                        </a>
+                    {% empty %}
+                        <div class="list-group-item text-muted">
+                            No hay noticias destacadas
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenido Principal -->
+        <div class="col-lg-9">
+            <!-- Buscador -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <form method="get" class="d-flex gap-2">
+                        <input type="text" name="q" class="form-control" placeholder="Buscar noticias..." value="{{ request.GET.q }}">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search"></i> Buscar
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Listado de Noticias -->
+            {% if noticias %}
+                <div class="row">
+                    {% for noticia in noticias %}
+                        <div class="col-md-6 mb-4">
+                            <div class="card h-100 shadow-sm">
+                                {% if noticia.imagen %}
+                                    <img src="{{ noticia.imagen.url }}" class="card-img-top" alt="{{ noticia.titulo }}">
+                                {% else %}
+                                    <div class="bg-light p-5 text-center">
+                                        <i class="fas fa-image fa-3x text-muted"></i>
+                                    </div>
+                                {% endif %}
+                                
+                                <div class="card-body d-flex flex-column">
+                                    <div class="mb-2">
+                                        <span class="badge bg-primary">{{ noticia.categoria.nombre }}</span>
+                                        {% if noticia.destacado %}
+                                            <span class="badge bg-warning text-dark">
+                                                <i class="fas fa-star"></i> Destacada
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <h5 class="card-title">{{ noticia.titulo }}</h5>
+                                    
+                                    <p class="card-text text-muted flex-grow-1">
+                                        {{ noticia.get_epigrafe }}...
+                                    </p>
+                                    
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">
+                                            <i class="fas fa-calendar"></i> {{ noticia.fecha|date:'d/m/Y' }}
+                                        </small>
+                                        <a href="{% url 'noticias:detalle' noticia.slug %}" class="btn btn-sm btn-outline-primary">
+                                            Leer más
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Paginación -->
+                {% if is_paginated %}
+                    <nav aria-label="Paginación" class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1">Primera</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+                                </li>
+                            {% endif %}
+                            
+                            <li class="page-item active">
+                                <span class="page-link">
+                                    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                                </span>
+                            </li>
+                            
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Última</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                {% endif %}
+            {% else %}
+                <div class="alert alert-info" role="alert">
+                    <i class="fas fa-info-circle"></i> No se encontraron noticias.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

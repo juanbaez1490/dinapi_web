@@ -1,6 +1,7 @@
 from django.apps import AppConfig
 
 
-class BibliotecaConfig(AppConfig):
+class TarjetasConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'biblioteca'
+    name = 'apps.tarjetas'
+    verbose_name = 'Tarjetas'
