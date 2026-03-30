@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(135deg, #114875 0%, #00529C 100%);
+            color: white;
+        }
+        .header img {
+            max-width: 150px;
+            height: auto;
+            margin-bottom: 15px;
+        }
+        .header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+        .content {
+            padding: 30px;
+        }
+        .field {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .field:last-child {
+            border-bottom: none;
+        }
+        .label {
+            color: #114875;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .value {
+            color: #666;
+        }
+        .mensaje-box {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-left: 4px solid #00529C;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #999;
+            font-size: 12px;
+            border-top: 1px solid #eee;
+        }
+        .footer p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="https://www.dinapi.gov.py/portal/v3/themes/dinapi/img/logo.png" alt="DINAPI Logo">
+            <h2>Mensaje de Contacto</h2>
+            <p style="margin: 10px 0 0 0; opacity: 0.9;">Desde el Sitio Web de DINAPI</p>
+        </div>
+        
+        <div class="content">
+            <div class="field">
+                <span class="label">Nombre Completo:</span>
+                <span class="value">{{ mensaje.nombre }} {{ mensaje.apellido }}</span>
+            </div>
+            
+            <div class="field">
+                <span class="label">Correo Electrónico:</span>
+                <span class="value">
+                    <a href="mailto:{{ mensaje.email }}" style="color: #00529C; text-decoration: none;">
+                        {{ mensaje.email }}
+                    </a>
+                </span>
+            </div>
+            
+            {% if mensaje.documento %}
+                <div class="field">
+                    <span class="label">Documento:</span>
+                    <span class="value">{{ mensaje.documento }}</span>
+                </div>
+            {% endif %}
+            
+            {% if mensaje.telefono %}
+                <div class="field">
+                    <span class="label">Teléfono:</span>
+                    <span class="value">{{ mensaje.telefono }}</span>
+                </div>
+            {% endif %}
+            
+            <div class="field">
+                <span class="label">Tema de Contacto:</span>
+                <span class="value">{{ mensaje.get_tema_display }}</span>
+            </div>
+            
+            <div class="field">
+                <span class="label">Mensaje:</span>
+                <div class="mensaje-box">
+                    {{ mensaje.mensaje|linebreaks }}
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px; padding-top: 30px; border-top: 2px solid #eee;">
+                <p style="color: #00529C; font-weight: bold; margin-bottom: 10px;">
+                    <i>Fecha de recepción: {{ mensaje.fecha_creacion|date:'d/m/Y H:i:s' }}</i>
+                </p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Este es un mensaje automático. Por favor, no responda a este email.</p>
+            <p>&copy; 2026 DINAPI. Todos los derechos reservados.</p>
+            <p>Dirección Nacional de Propiedad Intelectual - Paraguay</p>
+        </div>
+    </div>
+</body>
+</html>
