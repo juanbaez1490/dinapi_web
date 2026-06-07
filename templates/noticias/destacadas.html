@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Noticias Destacadas - DINAPI{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    {% if noticias %}
+        <div class="row">
+            {% for noticia in noticias %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        {% if noticia.imagen %}
+                            <img src="{{ noticia.imagen.url }}" class="card-img-top" alt="{{ noticia.titulo }}">
+                        {% endif %}
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">{{ noticia.titulo }}</h5>
+                            <p class="card-text text-muted">{{ noticia.get_epigrafe }}...</p>
+                            <a href="{% url 'noticias:detalle' noticia.slug %}" class="btn btn-outline-primary mt-auto">Leer mas</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            No hay noticias destacadas disponibles.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

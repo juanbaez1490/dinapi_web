@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Reclamos y Consultas — DINAPI{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="max-width:760px;">
+
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+      <li class="breadcrumb-item active">Reclamos y Consultas</li>
+    </ol>
+  </nav>
+
+  <h1 class="mb-1" style="font-size:1.7rem; font-weight:800; color:#1a2a3d;">
+    Reclamos y Consultas
+  </h1>
+  <p class="text-muted mb-4" style="font-size:.92rem;">
+    Complete el formulario para enviar su reclamo. Los campos marcados con <strong>*</strong> son obligatorios.
+  </p>
+
+  <div class="card shadow-sm border-0 p-4">
+    <form method="post" enctype="multipart/form-data" novalidate>
+      {% csrf_token %}
+
+      <div class="row g-3">
+
+        <div class="col-md-6">
+          <label for="{{ form.nombre.id_for_label }}" class="form-label fw-semibold">
+            {{ form.nombre.label }}
+          </label>
+          {{ form.nombre }}
+          {% if form.nombre.errors %}
+            <div class="text-danger small mt-1">{{ form.nombre.errors|join:", " }}</div>
+          {% endif %}
+        </div>
+
+        <div class="col-md-6">
+          <label for="{{ form.email.id_for_label }}" class="form-label fw-semibold">
+            {{ form.email.label }}
+          </label>
+          {{ form.email }}
+          {% if form.email.errors %}
+            <div class="text-danger small mt-1">{{ form.email.errors|join:", " }}</div>
+          {% endif %}
+        </div>
+
+        <div class="col-md-6">
+          <label for="{{ form.telefono.id_for_label }}" class="form-label fw-semibold">
+            {{ form.telefono.label }}
+          </label>
+          {{ form.telefono }}
+          {% if form.telefono.errors %}
+            <div class="text-danger small mt-1">{{ form.telefono.errors|join:", " }}</div>
+          {% endif %}
+        </div>
+
+        <div class="col-md-6">
+          <label for="{{ form.expediente.id_for_label }}" class="form-label fw-semibold">
+            {{ form.expediente.label }}
+          </label>
+          {{ form.expediente }}
+          {% if form.expediente.errors %}
+            <div class="text-danger small mt-1">{{ form.expediente.errors|join:", " }}</div>
+          {% endif %}
+        </div>
+
+        <div class="col-12">
+          <label for="{{ form.tema.id_for_label }}" class="form-label fw-semibold">
+            {{ form.tema.label }}
+          </label>
+          {{ form.tema }}
+          {% if form.tema.errors %}
+            <div class="text-danger small mt-1">{{ form.tema.errors|join:", " }}</div>
+          {% endif %}
+        </div>
+
+        <div class="col-12">
+          <label for="{{ form.descripcion.id_for_label }}" class="form-label fw-semibold">
+            {{ form.descripcion.label }}
+          </label>
+          {{ form.descripcion }}
+          {% if form.descripcion.errors %}
+            <div class="text-danger small mt-1">{{ form.descripcion.errors|join:", " }}</div>
+          {% endif %}
+        </div>
+
+        <div class="col-12">
+          <label for="{{ form.adjunto.id_for_label }}" class="form-label fw-semibold">
+            {{ form.adjunto.label }}
+          </label>
+          {{ form.adjunto }}
+          <div class="form-text">{{ form.adjunto.help_text }}</div>
+          {% if form.adjunto.errors %}
+            <div class="text-danger small mt-1">{{ form.adjunto.errors|join:", " }}</div>
+          {% endif %}
+        </div>
+
+        {% if form.non_field_errors %}
+        <div class="col-12">
+          <div class="alert alert-danger py-2">{{ form.non_field_errors }}</div>
+        </div>
+        {% endif %}
+
+        <div class="col-12 mt-2">
+          <button type="submit" class="btn btn-primary px-5">
+            <i class="fas fa-paper-plane me-2"></i>Enviar reclamo
+          </button>
+        </div>
+
+      </div>
+    </form>
+  </div>
+
+</div>
+{% endblock %}

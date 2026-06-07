@@ -1,0 +1,44 @@
+{# Partial: carousel del home. Incluir con {% include "core/partials/_carousel.html" %} #}
+{% if carousel_items %}
+<div id="homeCarousel" class="carousel slide mb-4" data-bs-ride="carousel">
+  <div class="carousel-indicators">
+    {% for slide in carousel_items %}
+    <button type="button" data-bs-target="#homeCarousel" data-bs-slide-to="{{ forloop.counter0 }}"
+      {% if forloop.first %}class="active" aria-current="true"{% endif %}
+      aria-label="{{ slide.titulo }}"></button>
+    {% endfor %}
+  </div>
+  <div class="carousel-inner">
+    {% for slide in carousel_items %}
+    <div class="carousel-item{% if forloop.first %} active{% endif %}">
+      {% if slide.imagen %}
+        <img src="{{ slide.imagen.url }}" class="d-block w-100" alt="{{ slide.titulo }}"
+             style="max-height:480px; object-fit:cover;">
+      {% else %}
+        <div class="bg-dinapi-blue d-flex align-items-center justify-content-center"
+             style="height:320px;"></div>
+      {% endif %}
+      <div class="carousel-caption d-none d-md-block">
+        <h2 class="fw-bold">{{ slide.titulo }}</h2>
+        {% if slide.subtitulo %}<p>{{ slide.subtitulo }}</p>{% endif %}
+        {% if slide.url %}
+          <a href="{{ slide.url }}" class="btn btn-light btn-sm mt-1">
+            {{ slide.texto_boton|default:"Ver más" }}
+          </a>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% if carousel_items|length > 1 %}
+  <button class="carousel-control-prev" type="button" data-bs-target="#homeCarousel" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Anterior</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#homeCarousel" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Siguiente</span>
+  </button>
+  {% endif %}
+</div>
+{% endif %}

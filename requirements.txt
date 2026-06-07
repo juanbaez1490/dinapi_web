@@ -1,12 +1,19 @@
-# Django 5.2 es la versión LTS (Soporte Largo hasta 2028)
+# Django 5.2 LTS (soporte hasta 2028)
 Django>=5.2,<5.3
 
-# Formularios con Bootstrap 5 (Versiones compatibles con Django 5+)
+# Formularios con Bootstrap 5
 django-crispy-forms>=2.3
 crispy-bootstrap5>=2024.10
 
-# Manejo de variables de entorno (.env)
+# Variables de entorno (.env)
 python-decouple>=3.8
 
-# Manejo de imágenes (Versión con binarios pre-compilados para evitar errores)
+# Base de datos: parseo de DATABASE_URL para MySQL/Postgres/SQLite
+dj-database-url>=2.2
+
+# Manejo de imágenes
 Pillow>=10.4.0
+
+# Drivers de base de datos (descomentar según el entorno de producción)
+# mysqlclient>=2.2          # MySQL / MariaDB
+# psycopg2-binary>=2.9      # PostgreSQL

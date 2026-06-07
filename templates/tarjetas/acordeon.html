@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block title %}Acordeon - DINAPI{% endblock %}
+
+{% block extra_css %}
+<style>
+    .acordeon-page {
+        padding: 1.5rem 0 3rem;
+    }
+    .acordeon-head {
+        background: #f4f6f8;
+        border-left: 6px solid #00529c;
+        padding: 0.85rem 1rem;
+        margin-bottom: 1rem;
+    }
+    .acordeon-head h1 {
+        margin: 0;
+        font-size: 1.25rem;
+        color: #1b3242;
+        font-weight: 700;
+    }
+    .acordeon-head p {
+        margin: 0.2rem 0 0;
+        font-size: 0.87rem;
+        color: #5c6874;
+    }
+    .acordeon-card {
+        border: 1px solid #e3e6ea;
+        box-shadow: 0 6px 18px rgba(0,0,0,.09);
+    }
+    .acordeon-card .card-body {
+        padding: 1rem;
+    }
+    .acordeon-card h2 {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #213447;
+    }
+    .acordeon-card .accordion-button {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #203244;
+    }
+    .acordeon-card .accordion-body {
+        font-size: 0.87rem;
+    }
+    .acordeon-card .btn {
+        font-size: 0.8rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="acordeon-page">
+    <div class="container my-0">
+        <div class="acordeon-head">
+            <h1>Acordeon</h1>
+            <p>Contenidos desplegables y anexos</p>
+        </div>
+    </div>
+
+<div class="container my-0">
+    {% for pagina in paginas_acordeon %}
+        <div class="card acordeon-card mb-4">
+            <div class="card-body">
+                {% if pagina.titulo_padre %}
+                    <h2 class="h4 mb-3">{{ pagina.titulo_padre }}</h2>
+                {% endif %}
+
+                {% if pagina.contenido_superior %}
+                    <div class="mb-3">{{ pagina.contenido_superior|safe }}</div>
+                {% endif %}
+
+                <div class="accordion" id="accordionPagina{{ pagina.id }}">
+                    {% for item in pagina.desplegables.all %}
+                        <div class="accordion-item">
+                            <h3 class="accordion-header" id="heading{{ item.id }}">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ item.id }}" aria-expanded="false" aria-controls="collapse{{ item.id }}">
+                                    {{ item.titulo }}
+                                </button>
+                            </h3>
+                            <div id="collapse{{ item.id }}" class="accordion-collapse collapse" aria-labelledby="heading{{ item.id }}" data-bs-parent="#accordionPagina{{ pagina.id }}">
+                                <div class="accordion-body">
+                                    {{ item.contenido|safe }}
+                                    {% if item.adjunto %}
+                                        <div class="mt-3">
+                                            <a class="btn btn-info btn-sm" href="{{ item.adjunto.url }}" target="_blank" rel="noopener">{{ item.titulo_adjunto|default:'Descargar adjunto' }}</a>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="text-muted">No hay elementos desplegables.</div>
+                    {% endfor %}
+                </div>
+
+                {% if pagina.anexo %}
+                    <div class="mt-4">
+                        <a class="btn btn-outline-secondary" href="{{ pagina.anexo.url }}" target="_blank" rel="noopener">{{ pagina.titulo_anexo|default:'Ver anexo' }}</a>
+                    </div>
+                {% endif %}
+
+                {% if pagina.contenido_inferior %}
+                    <div class="mt-4">{{ pagina.contenido_inferior|safe }}</div>
+                {% endif %}
+            </div>
+        </div>
+    {% empty %}
+        <div class="alert alert-info">No hay paginas de acordeon disponibles.</div>
+    {% endfor %}
+</div>
+</div>
+{% endblock %}

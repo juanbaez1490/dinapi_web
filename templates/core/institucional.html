@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ pagina.titulo }} - DINAPI{% endblock %}
+
+{% block extra_css %}
+<style>
+    .institucional-page {
+        padding-bottom: 2.3rem;
+    }
+
+    .institucional-hero {
+        position: relative;
+        min-height: 210px;
+        display: flex;
+        align-items: flex-start;
+        border-bottom: 4px solid #d4d4d4;
+        overflow: hidden;
+        background: linear-gradient(135deg, #24384b 0%, #0f1f2f 100%);
+    }
+
+    .institucional-hero img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .institucional-hero::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(11, 21, 30, 0.25), rgba(11, 21, 30, 0.55));
+    }
+
+    .institucional-title {
+        position: relative;
+        z-index: 2;
+        color: #ffffff;
+        font-weight: 800;
+        font-size: 1.9rem;
+        letter-spacing: 0.01em;
+        text-transform: uppercase;
+        margin: 0;
+        padding: 0.8rem 1.2rem;
+        text-shadow: 0 3px 10px rgba(0, 0, 0, 0.55);
+    }
+
+    .institucional-content {
+        max-width: 1140px;
+        margin: 0 auto;
+        padding: 0.9rem;
+    }
+
+    .institucional-grid {
+        margin-top: 0.4rem;
+    }
+
+    .institucional-card {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        text-decoration: none;
+        color: #ffffff;
+        min-height: 82px;
+        border-radius: 10px;
+        overflow: hidden;
+        font-weight: 600;
+        line-height: 1.2;
+        padding: 0.85rem 1rem;
+        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.2);
+        transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+    }
+
+    .institucional-card:hover,
+    .institucional-card:focus {
+        color: #ffffff;
+        transform: translateY(-2px);
+        box-shadow: 0 12px 22px rgba(0, 0, 0, 0.24);
+        filter: saturate(1.04);
+    }
+
+    .institucional-card::after {
+        content: '';
+        position: absolute;
+        right: -1px;
+        top: 0;
+        width: 32%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0));
+        clip-path: polygon(55% 0, 100% 0, 100% 100%, 0 100%);
+        pointer-events: none;
+    }
+
+    .institucional-card.variant-0 {
+        background: linear-gradient(90deg, #c3142f 0%, #dd1d34 100%);
+    }
+
+    .institucional-card.variant-1 {
+        background: linear-gradient(90deg, #005aa8 0%, #0a4b86 100%);
+    }
+
+    .institucional-card.variant-2 {
+        background: linear-gradient(90deg, #efb310 0%, #d9a00a 100%);
+    }
+
+    .institucional-empty {
+        margin-top: 1rem;
+    }
+
+    @media (max-width: 991.98px) {
+        .institucional-title {
+            font-size: 1.5rem;
+            padding: 0.7rem 0.9rem;
+        }
+
+        .institucional-card {
+            min-height: 74px;
+            border-radius: 8px;
+            font-size: 0.96rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="institucional-page">
+    <section class="institucional-hero" aria-label="Cabecera institucional">
+        {% if pagina.imagen_principal %}
+            <img src="{{ pagina.imagen_principal.url }}" alt="{{ pagina.titulo }}">
+        {% endif %}
+        <h1 class="institucional-title">{{ pagina.titulo }}</h1>
+    </section>
+
+    <div class="institucional-content">
+        {% if tarjetas_institucionales %}
+            <div class="row g-3 institucional-grid">
+                {% for item in tarjetas_institucionales %}
+                <div class="col-12 col-md-6 col-lg-4">
+                    <a class="institucional-card variant-{{ item.variant }}" href="{{ item.url }}">{{ item.titulo }}</a>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info institucional-empty">No hay tarjetas institucionales disponibles.</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

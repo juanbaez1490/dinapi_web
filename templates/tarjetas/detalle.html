@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ pagina.titulo|default:'Tarjetas' }} - DINAPI{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+	<nav aria-label="breadcrumb" class="mb-3">
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item"><a href="{% url 'core:home' %}">Inicio</a></li>
+			<li class="breadcrumb-item"><a href="{% url 'tarjetas:lista' %}">Tarjetas</a></li>
+			<li class="breadcrumb-item active" aria-current="page">{{ pagina.titulo|default:'Sección' }}</li>
+		</ol>
+	</nav>
+
+	<h1 class="mb-4">{{ pagina.titulo|default:'Tarjetas' }}</h1>
+
+	{% if pagina.imagen %}
+	<img src="{{ pagina.imagen.url }}" class="img-fluid mb-4 rounded" alt="{{ pagina.titulo }}">
+	{% endif %}
+
+	{% if tarjetas %}
+	<div class="row g-3">
+		{% for tarjeta in tarjetas %}
+		<div class="col-md-6 col-lg-4">
+			<div class="card h-100">
+				{% if tarjeta.imagen %}
+				<img src="{{ tarjeta.imagen.url }}" class="card-img-top" alt="{{ tarjeta.titulo }}">
+				{% endif %}
+				<div class="card-body">
+					<h3 class="h6 card-title">{{ tarjeta.titulo }}</h3>
+					{% if tarjeta.subtitulo %}
+					<p class="card-text small text-muted mb-2">{{ tarjeta.subtitulo }}</p>
+					{% endif %}
+					{% if tarjeta.enlace_resuelto %}
+					<a href="{{ tarjeta.enlace_resuelto }}" class="btn btn-sm btn-primary"
+					   {% if tarjeta.link_externo %}target="_blank" rel="noopener"{% endif %}>
+						Ver más
+					</a>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+		{% endfor %}
+	</div>
+	{% else %}
+	<div class="alert alert-info">No hay tarjetas disponibles en esta sección.</div>
+	{% endif %}
+
+	<div class="mt-4 pt-3 border-top">
+		<a href="{% url 'tarjetas:lista' %}" class="btn btn-outline-secondary btn-sm">
+			&larr; Volver a tarjetas
+		</a>
+	</div>
+</div>
+{% endblock %}

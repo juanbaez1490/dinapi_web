@@ -1,161 +1,209 @@
-{% extends 'base.html' %}
+﻿{% extends 'base.html' %}
+{% load static %}
 
 {% block title %}{{ noticia.titulo }} - DINAPI{% endblock %}
 
-{% block content %}
-<div class="hero-section">
-    <div class="container">
-        <h1>{{ noticia.titulo }}</h1>
-        <p class="mb-0">
-            <i class="fas fa-calendar"></i> {{ noticia.fecha|date:'d \de F \de Y' }}
-        </p>
-    </div>
-</div>
-
-<div class="container my-5">
-    <div class="row">
-        <!-- Contenido Principal -->
-        <div class="col-lg-8">
-            <article class="card shadow-sm mb-4">
-                {% if noticia.imagen %}
-                    <img src="{{ noticia.imagen.url }}" class="card-img-top" alt="{{ noticia.titulo }}">
-                {% endif %}
-                
-                <div class="card-body">
-                    <div class="mb-4">
-                        <span class="badge bg-primary">{{ noticia.categoria.nombre }}</span>
-                        {% if noticia.destacado %}
-                            <span class="badge bg-warning text-dark">
-                                <i class="fas fa-star"></i> Destacada
-                            </span>
-                        {% endif %}
-                    </div>
-                    
-                    <div class="noticia-contenido">
-                        {{ noticia.contenido|safe }}
-                    </div>
-                    
-                    <hr>
-                    
-                    <div class="text-muted">
-                        <p>
-                            <i class="fas fa-calendar"></i> Publicado: {{ noticia.fecha_creacion|date:'d/m/Y H:i' }}<br>
-                            <i class="fas fa-edit"></i> Actualizado: {{ noticia.fecha_modificacion|date:'d/m/Y H:i' }}
-                        </p>
-                    </div>
-                </div>
-            </article>
-
-            <!-- Compartir -->
-            <div class="card shadow-sm mb-4">
-                <div class="card-body">
-                    <h6 class="card-title">Compartir:</h6>
-                    <div class="d-flex gap-2">
-                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" 
-                           target="_blank" class="btn btn-sm btn-primary">
-                            <i class="fab fa-facebook"></i> Facebook
-                        </a>
-                        <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}&text={{ noticia.titulo }}" 
-                           target="_blank" class="btn btn-sm btn-info">
-                            <i class="fab fa-twitter"></i> Twitter
-                        </a>
-                        <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.build_absolute_uri }}" 
-                           target="_blank" class="btn btn-sm btn-dark">
-                            <i class="fab fa-linkedin"></i> LinkedIn
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Sidebar -->
-        <div class="col-lg-4">
-            <!-- Información Noticia -->
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><i class="fas fa-info-circle"></i> Información</h5>
-                </div>
-                <div class="list-group list-group-flush">
-                    <div class="list-group-item">
-                        <small class="text-muted">Categoría</small><br>
-                        <strong>{{ noticia.categoria.nombre }}</strong>
-                    </div>
-                    <div class="list-group-item">
-                        <small class="text-muted">Fecha</small><br>
-                        <strong>{{ noticia.fecha|date:'d/m/Y' }}</strong>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Noticias Relacionadas -->
-            {% if noticias_relacionadas %}
-                <div class="card shadow-sm">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0"><i class="fas fa-link"></i> Noticias Relacionadas</h5>
-                    </div>
-                    <div class="list-group list-group-flush">
-                        {% for noticia_rel in noticias_relacionadas %}
-                            <a href="{% url 'noticias:detalle' noticia_rel.slug %}" 
-                               class="list-group-item list-group-item-action">
-                                <small class="text-muted d-block">{{ noticia_rel.fecha|date:'d/m/Y' }}</small>
-                                <strong>{{ noticia_rel.titulo|truncatewords:8 }}</strong>
-                            </a>
-                        {% endfor %}
-                    </div>
-                </div>
-            {% endif %}
-        </div>
-    </div>
-
-    <!-- Navegación -->
-    <div class="row mt-5">
-        <div class="col-12">
-            <a href="{% url 'noticias:lista' %}" class="btn btn-outline-primary">
-                <i class="fas fa-arrow-left"></i> Volver a noticias
-            </a>
-        </div>
-    </div>
-</div>
-
+{% block extra_css %}
 <style>
-    .noticia-contenido {
-        font-size: 1.1rem;
-        line-height: 1.8;
-    }
-    
-    .noticia-contenido img {
-        max-width: 100%;
-        height: auto;
-        border-radius: 8px;
-        margin: 20px 0;
-    }
-    
-    .noticia-contenido h2 {
-        color: var(--primary-color);
-        margin-top: 30px;
-        margin-bottom: 15px;
-        font-weight: bold;
-    }
-    
-    .noticia-contenido h3 {
-        color: var(--secondary-color);
-        margin-top: 20px;
-        margin-bottom: 10px;
-    }
-    
-    .noticia-contenido p {
-        margin-bottom: 15px;
-        text-align: justify;
-    }
-    
-    .noticia-contenido a {
-        color: var(--secondary-color);
-        text-decoration: none;
-        font-weight: 500;
-    }
-    
-    .noticia-contenido a:hover {
-        text-decoration: underline;
-    }
+	.noticia-detalle-page {
+		padding: 1.5rem 0 3rem;
+	}
+	.noticia-detalle-page .page-container {
+		max-width: 1140px;
+		margin: 0 auto;
+		padding: 0 0.9rem;
+	}
+	.nd-sidebar h1 {
+		font-size: 1.35rem;
+		font-weight: 700;
+		color: var(--dinapi-blue-deep);
+		margin-bottom: 0.85rem;
+	}
+	.nd-sidebar .infodinapi-img {
+		width: 100%;
+		border-radius: 4px;
+		box-shadow: 0 4px 12px rgba(0,0,0,.15);
+	}
+	.nd-sidebar .btn-download {
+		background-color: var(--dinapi-blue);
+		color: #fff;
+		font-size: 0.85rem;
+		padding: 0.42rem 0.85rem;
+		border-radius: 4px;
+		text-decoration: none;
+		display: inline-block;
+		margin-top: 0.75rem;
+	}
+	.nd-sidebar .btn-download:hover { background-color: var(--dinapi-blue-deep); color:#fff; }
+	.nd-sidebar .relacionadas-title {
+		font-size: 0.78rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: .04em;
+		color: #777;
+		margin: 1.2rem 0 0.4rem;
+	}
+	.nd-sidebar .relacionadas-list { list-style: none; margin: 0; padding: 0; }
+	.nd-sidebar .relacionadas-list li { border-bottom: 1px solid #e4e4e4; }
+	.nd-sidebar .relacionadas-list a {
+		display: block;
+		padding: 0.42rem 0.1rem;
+		font-size: 0.8rem;
+		color: #2d4057;
+		text-decoration: none;
+		line-height: 1.3;
+	}
+	.nd-sidebar .relacionadas-list a:hover { color: var(--dinapi-blue); }
+	.nd-sidebar .relacionadas-list .rel-date {
+		display: block;
+		font-size: 0.68rem;
+		color: #aaa;
+	}
+	.nd-content .noticias-titulo {
+		font-size: 1.45rem;
+		font-weight: 700;
+		color: var(--dinapi-blue-deep);
+		line-height: 1.3;
+		margin-bottom: 0.7rem;
+	}
+	.nd-content .date-noticia {
+		font-size: 0.78rem;
+		color: #888;
+		text-align: right;
+		margin-bottom: 0.5rem;
+	}
+	.nd-content .share-bar {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		margin-bottom: 0.6rem;
+		flex-wrap: wrap;
+	}
+	.nd-content .share-bar a {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.3rem;
+		font-size: 0.76rem;
+		padding: 0.28rem 0.65rem;
+		border-radius: 4px;
+		text-decoration: none;
+		color: #fff;
+	}
+	.nd-content .share-bar .share-fb { background: #1877f2; }
+	.nd-content .share-bar .share-x  { background: #000; }
+	.nd-content .share-bar .share-wa { background: #25d366; }
+	.nd-content .share-bar a:hover { opacity: .85; }
+	.nd-content .img-noticia {
+		max-width: 100%;
+		height: auto;
+		margin-bottom: 1.1rem;
+		border-radius: 4px;
+	}
+	.noticias-texto { font-size: 0.9rem; }
+	.noticias-texto img {
+		max-width: 100%;
+		height: auto;
+		margin-bottom: 1rem;
+		border-radius: 4px;
+	}
+	.noticias-texto p { margin-bottom: 0.85rem; text-align: justify; }
+	.noticias-texto h2,
+	.noticias-texto h3 { color: var(--dinapi-blue-deep); margin-top: 1.1rem; }
+	.back-link {
+		font-size: 0.83rem;
+		color: var(--dinapi-blue);
+		text-decoration: none;
+	}
+	.back-link:hover { text-decoration: underline; }
 </style>
 {% endblock %}
+
+{% block content %}
+<div class="noticia-detalle-page">
+	<div class="container page-container">
+		<div class="row" id="information-container">
+
+			<!-- Sidebar -->
+			<div class="col-md-3 nd-sidebar px-3 px-md-4 mb-4 d-none d-md-block">
+				<h1>Centro de Noticias</h1>
+				{% if ultimo_boletin and ultimo_boletin.imagen %}
+				<img
+					src="{{ ultimo_boletin.imagen.url }}"
+					class="infodinapi-img img-fluid"
+					alt="INFODINAPI">
+				{% endif %}
+				{% if ultimo_boletin and ultimo_boletin.pdf %}
+				<a href="{{ ultimo_boletin.pdf.url }}"
+				   target="_blank" rel="noopener" class="btn-download">
+					Descargar INFODINAPI
+				</a>
+				{% endif %}
+
+				{% if noticias_relacionadas %}
+				<p class="relacionadas-title">Noticias relacionadas</p>
+				<ul class="relacionadas-list">
+					{% for rel in noticias_relacionadas %}
+					<li>
+						<a href="{% url 'noticias:detalle' rel.slug %}">
+							<span class="rel-date">{{ rel.fecha|date:'d-m-Y' }}</span>
+							{{ rel.titulo|truncatewords:10 }}
+						</a>
+					</li>
+					{% endfor %}
+				</ul>
+				{% endif %}
+			</div>
+
+			<!-- Contenido -->
+			<div class="col-md-9 nd-content mt-0">
+				<div class="container noticias-texto">
+
+					<div class="row mb-2">
+						<div class="col-12">
+							<h2 class="noticias-titulo">{{ noticia.titulo }}</h2>
+						</div>
+						<div class="col-md-8">
+							<div class="share-bar">
+								<a class="share-fb"
+								   href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}"
+								   target="_blank" rel="noopener">
+									<i class="fab fa-facebook-square"></i> Facebook
+								</a>
+								<a class="share-x"
+								   href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}&text={{ noticia.titulo|urlencode }}"
+								   target="_blank" rel="noopener">
+									<svg width="14" height="14" viewBox="0 0 512 512" fill="currentColor"><path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z"/></svg>
+									X / Twitter
+								</a>
+								<a class="share-wa"
+								   href="https://api.whatsapp.com/send?text={{ noticia.titulo|urlencode }}%20{{ request.build_absolute_uri|urlencode }}"
+								   target="_blank" rel="noopener">
+									<i class="fab fa-whatsapp"></i> WhatsApp
+								</a>
+							</div>
+						</div>
+						<div class="col-md-4">
+							<p class="date-noticia">{{ noticia.fecha|date:'d-m-Y' }}</p>
+						</div>
+					</div>
+
+					{% if noticia.imagen %}
+					<img src="{{ noticia.imagen.url }}" class="img-fluid img-noticia" alt="{{ noticia.titulo }}">
+					{% endif %}
+
+					<div>{{ noticia.contenido|safe }}</div>
+
+					<div class="mt-4 pt-2 border-top">
+						<a href="{% url 'noticias:lista' %}" class="back-link">
+							<i class="fas fa-arrow-left"></i> Volver a noticias
+						</a>
+					</div>
+
+				</div>
+			</div>
+
+		</div>
+	</div>
+</div>
+{% endblock %}
+

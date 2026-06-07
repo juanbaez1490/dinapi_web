@@ -1,149 +1,281 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Noticias - DINAPI{% endblock %}
 
-{% block content %}
-<div class="hero-section">
-    <div class="container">
-        <h1><i class="fas fa-newspaper"></i> Noticias</h1>
-        <p>Mantente informado sobre las últimas novedades de propiedad intelectual</p>
-    </div>
-</div>
+{% block extra_css %}
+<style>
+    .noticias-page {
+        padding: 1.5rem 0 3rem;
+    }
+    .noticias-page .page-container {
+        max-width: 1140px;
+        margin: 0 auto;
+        padding: 0 0.9rem;
+    }
+    /* sidebar */
+    .sidebar-links h1 {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: var(--dinapi-blue-deep);
+        margin-bottom: 0.9rem;
+    }
+    .sidebar-links .infodinapi-img {
+        width: 100%;
+        border-radius: 4px;
+        box-shadow: 0 4px 12px rgba(0,0,0,.15);
+    }
+    .sidebar-links .btn-download {
+        background-color: var(--dinapi-blue);
+        color: #fff;
+        font-size: 0.85rem;
+        padding: 0.4rem 0.8rem;
+        border-radius: 4px;
+        text-decoration: none;
+        display: inline-block;
+        margin-top: 0.7rem;
+    }
+    .sidebar-links .btn-download:hover { background-color: var(--dinapi-blue-deep); color:#fff; }
+    .sidebar-cat-title {
+        font-size: 0.78rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        color: #777;
+        margin: 1.2rem 0 0.4rem;
+    }
+    .sidebar-cat-list { list-style: none; margin: 0; padding: 0; }
+    .sidebar-cat-list li { border-bottom: 1px solid #e4e4e4; }
+    .sidebar-cat-list a {
+        display: block;
+        padding: 0.42rem 0.1rem;
+        font-size: 0.82rem;
+        color: #2d4057;
+        text-decoration: none;
+    }
+    .sidebar-cat-list a:hover { color: var(--dinapi-blue); }
+    .sidebar-cat-list a.active { color: var(--dinapi-red); font-weight: 600; }
+    /* search bar */
+    .noticias-search-form {
+        display: flex;
+        gap: 0.4rem;
+        margin-bottom: 1.1rem;
+    }
+    .noticias-search-form .form-control {
+        border-radius: 999px;
+        font-size: 0.83rem;
+        padding: 0.38rem 0.9rem;
+    }
+    .noticias-search-form .btn {
+        border-radius: 999px;
+        font-size: 0.82rem;
+        background: var(--dinapi-blue);
+        color: #fff;
+        border: 0;
+        padding: 0.38rem 0.85rem;
+        white-space: nowrap;
+    }
+    .noticias-search-form .btn:hover { background: var(--dinapi-blue-deep); }
+    /* cards */
+    .noticia-card {
+        border: 0;
+        border-radius: 6px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,.10);
+        transition: transform .22s ease, box-shadow .22s ease;
+        height: 100%;
+    }
+    .noticia-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 22px rgba(0,0,0,.14);
+    }
+    .noticia-card .card-img-top {
+        height: 170px;
+        object-fit: cover;
+        width: 100%;
+    }
+    .noticia-card .card-img-placeholder {
+        height: 170px;
+        background: #e4e9ef;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #aab;
+        font-size: 2.5rem;
+    }
+    .noticia-card .card-body { padding: 0.85rem; }
+    .noticia-card .date-noticia {
+        font-size: 0.72rem;
+        color: #888;
+        text-align: right;
+        margin-bottom: 0.3rem;
+    }
+    .noticia-card h4 {
+        font-size: 0.92rem;
+        font-weight: 700;
+        line-height: 1.3;
+        margin-bottom: 0.4rem;
+        color: var(--dinapi-blue-deep);
+    }
+    .noticia-card .card-text {
+        font-size: 0.8rem;
+        color: #555;
+        margin-bottom: 0.55rem;
+    }
+    .noticia-card .btn-ver-mas {
+        font-size: 0.75rem;
+        background-color: var(--dinapi-blue);
+        color: #fff;
+        border: 0;
+        padding: 0.26rem 0.65rem;
+        border-radius: 3px;
+    }
+    .noticia-card .btn-ver-mas:hover { background-color: var(--dinapi-blue-deep); }
+    /* badge */
+    .badge-cat {
+        font-size: 0.68rem;
+        background: var(--dinapi-blue);
+        color: #fff;
+        padding: 0.2em 0.55em;
+        border-radius: 3px;
+        margin-bottom: 0.35rem;
+        display: inline-block;
+    }
+    .badge-destacado {
+        font-size: 0.68rem;
+        background: var(--dinapi-gold);
+        color: #1d2530;
+        padding: 0.2em 0.55em;
+        border-radius: 3px;
+        margin-bottom: 0.35rem;
+        display: inline-block;
+        margin-left: 0.25rem;
+    }
+    /* pagination */
+    .pagination .page-link { color: var(--dinapi-blue); }
+    .pagination .page-item.active .page-link {
+        background-color: var(--dinapi-blue);
+        border-color: var(--dinapi-blue);
+    }
+</style>
+{% endblock %}
 
-<div class="container my-5">
-    <div class="row">
-        <!-- Sidebar Categorías y Búsqueda -->
-        <div class="col-lg-3 mb-4">
-            <div class="card shadow-sm mb-3">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><i class="fas fa-filter"></i> Categorías</h5>
-                </div>
-                <div class="list-group list-group-flush">
-                    <a href="{% url 'noticias:lista' %}" class="list-group-item list-group-item-action">
-                        Todas las noticias
-                    </a>
+{% block content %}
+<div class="noticias-page">
+    <div class="container page-container">
+        <div class="row" id="information-container">
+
+            <!-- Sidebar -->
+            <div class="col-md-3 sidebar-links px-3 px-md-4 mb-4">
+                <h1>Centro de Noticias</h1>
+                {% if ultimo_boletin and ultimo_boletin.imagen %}
+                <img
+                    src="{{ ultimo_boletin.imagen.url }}"
+                    class="infodinapi-img img-fluid"
+                    alt="INFODINAPI">
+                {% endif %}
+                {% if ultimo_boletin and ultimo_boletin.pdf %}
+                <a href="{{ ultimo_boletin.pdf.url }}"
+                   target="_blank" rel="noopener" class="btn-download">
+                    Descargar INFODINAPI
+                </a>
+                {% endif %}
+
+                <p class="sidebar-cat-title">Filtrar por categoría</p>
+                <ul class="sidebar-cat-list">
+                    <li>
+                        <a href="{% url 'noticias:lista' %}"
+                           class="{% if not request.GET.categoria %}active{% endif %}">
+                            Todas las noticias
+                        </a>
+                    </li>
                     {% for categoria in categorias %}
-                        <a href="?categoria={{ categoria.slug }}" class="list-group-item list-group-item-action">
+                    <li>
+                        <a href="?categoria={{ categoria.slug }}"
+                           class="{% if request.GET.categoria == categoria.slug %}active{% endif %}">
                             {{ categoria.nombre }}
                         </a>
+                    </li>
                     {% endfor %}
-                </div>
+                </ul>
             </div>
 
-            <!-- Noticias Destacadas -->
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><i class="fas fa-star"></i> Destacadas</h5>
-                </div>
-                <div class="list-group list-group-flush">
-                    {% for noticia in noticias_destacadas %}
-                        <a href="{% url 'noticias:detalle' noticia.slug %}" class="list-group-item list-group-item-action">
-                            <small class="text-muted d-block">{{ noticia.fecha|date:'d/m/Y' }}</small>
-                            <strong>{{ noticia.titulo }}</strong>
-                        </a>
-                    {% empty %}
-                        <div class="list-group-item text-muted">
-                            No hay noticias destacadas
-                        </div>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
+            <!-- Contenido -->
+            <div class="col-md-9 information-texto">
 
-        <!-- Contenido Principal -->
-        <div class="col-lg-9">
-            <!-- Buscador -->
-            <div class="card shadow-sm mb-4">
-                <div class="card-body">
-                    <form method="get" class="d-flex gap-2">
-                        <input type="text" name="q" class="form-control" placeholder="Buscar noticias..." value="{{ request.GET.q }}">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-search"></i> Buscar
-                        </button>
-                    </form>
-                </div>
-            </div>
+                <!-- Buscador -->
+                <form method="get" class="noticias-search-form">
+                    {% if request.GET.categoria %}
+                    <input type="hidden" name="categoria" value="{{ request.GET.categoria }}">
+                    {% endif %}
+                    <input type="text" name="q" class="form-control"
+                           placeholder="Buscar noticias…"
+                           value="{{ request.GET.q|default:'' }}">
+                    <button type="submit"><i class="fas fa-search"></i> Buscar</button>
+                </form>
 
-            <!-- Listado de Noticias -->
-            {% if noticias %}
-                <div class="row">
+                {% if noticias %}
+                <div class="row g-3">
                     {% for noticia in noticias %}
-                        <div class="col-md-6 mb-4">
-                            <div class="card h-100 shadow-sm">
-                                {% if noticia.imagen %}
-                                    <img src="{{ noticia.imagen.url }}" class="card-img-top" alt="{{ noticia.titulo }}">
-                                {% else %}
-                                    <div class="bg-light p-5 text-center">
-                                        <i class="fas fa-image fa-3x text-muted"></i>
-                                    </div>
-                                {% endif %}
-                                
-                                <div class="card-body d-flex flex-column">
-                                    <div class="mb-2">
-                                        <span class="badge bg-primary">{{ noticia.categoria.nombre }}</span>
-                                        {% if noticia.destacado %}
-                                            <span class="badge bg-warning text-dark">
-                                                <i class="fas fa-star"></i> Destacada
-                                            </span>
-                                        {% endif %}
-                                    </div>
-                                    
-                                    <h5 class="card-title">{{ noticia.titulo }}</h5>
-                                    
-                                    <p class="card-text text-muted flex-grow-1">
-                                        {{ noticia.get_epigrafe }}...
-                                    </p>
-                                    
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <small class="text-muted">
-                                            <i class="fas fa-calendar"></i> {{ noticia.fecha|date:'d/m/Y' }}
-                                        </small>
-                                        <a href="{% url 'noticias:detalle' noticia.slug %}" class="btn btn-sm btn-outline-primary">
-                                            Leer más
-                                        </a>
-                                    </div>
+                    <div class="col-sm-12 col-md-6 col-lg-4 mb-3">
+                        <div class="card noticia-card">
+                            {% if noticia.imagen %}
+                                <img class="card-img-top" src="{{ noticia.imagen.url }}" alt="{{ noticia.titulo }}">
+                            {% else %}
+                                <div class="card-img-placeholder">
+                                    <i class="fas fa-newspaper"></i>
                                 </div>
+                            {% endif %}
+                            <div class="card-body">
+                                <p class="date-noticia">{{ noticia.fecha|date:'d-m-Y' }}</p>
+                                {% if noticia.destacado %}<span class="badge-destacado"><i class="fas fa-star"></i> Destacada</span>{% endif %}
+                                <span class="badge-cat">{{ noticia.categoria.nombre }}</span>
+                                <h4>{{ noticia.titulo }}</h4>
+                                <p class="card-text">{{ noticia.get_epigrafe|truncatechars:120 }}…</p>
+                                <a href="{% url 'noticias:detalle' noticia.slug %}" class="btn btn-ver-mas">
+                                    Ver más
+                                </a>
                             </div>
                         </div>
+                    </div>
                     {% endfor %}
                 </div>
 
                 <!-- Paginación -->
                 {% if is_paginated %}
-                    <nav aria-label="Paginación" class="mt-4">
-                        <ul class="pagination justify-content-center">
-                            {% if page_obj.has_previous %}
-                                <li class="page-item">
-                                    <a class="page-link" href="?page=1">Primera</a>
-                                </li>
-                                <li class="page-item">
-                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
-                                </li>
-                            {% endif %}
-                            
-                            <li class="page-item active">
-                                <span class="page-link">
-                                    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
-                                </span>
-                            </li>
-                            
-                            {% if page_obj.has_next %}
-                                <li class="page-item">
-                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Siguiente</a>
-                                </li>
-                                <li class="page-item">
-                                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Última</a>
-                                </li>
-                            {% endif %}
-                        </ul>
-                    </nav>
+                <nav aria-label="Paginación" class="mt-4">
+                    <ul class="pagination justify-content-center flex-wrap">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?{% if request.GET.categoria %}categoria={{ request.GET.categoria }}&{% endif %}{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}page=1">«</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?{% if request.GET.categoria %}categoria={{ request.GET.categoria }}&{% endif %}{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}page={{ page_obj.previous_page_number }}">Anterior</a>
+                        </li>
+                        {% endif %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+                        </li>
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?{% if request.GET.categoria %}categoria={{ request.GET.categoria }}&{% endif %}{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}page={{ page_obj.next_page_number }}">Siguiente</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?{% if request.GET.categoria %}categoria={{ request.GET.categoria }}&{% endif %}{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}page={{ page_obj.paginator.num_pages }}">»</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
                 {% endif %}
-            {% else %}
-                <div class="alert alert-info" role="alert">
+
+                {% else %}
+                <div class="alert alert-info mt-3">
                     <i class="fas fa-info-circle"></i> No se encontraron noticias.
                 </div>
-            {% endif %}
-        </div>
+                {% endif %}
+
+            </div><!-- /col content -->
+        </div><!-- /row -->
     </div>
 </div>
 {% endblock %}

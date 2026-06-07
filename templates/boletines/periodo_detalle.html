@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ periodo.titulo }} - Boletines DINAPI{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+	<nav aria-label="breadcrumb" class="mb-3">
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item"><a href="{% url 'core:home' %}">Inicio</a></li>
+			{% if periodo.tipo == 'marca' %}
+			<li class="breadcrumb-item"><a href="{% url 'boletines:marcas' %}">Boletines Marca</a></li>
+			{% else %}
+			<li class="breadcrumb-item"><a href="{% url 'boletines:general' %}">Boletines</a></li>
+			{% endif %}
+			<li class="breadcrumb-item active" aria-current="page">{{ periodo.titulo }}</li>
+		</ol>
+	</nav>
+
+	<h1 class="mb-1">{{ periodo.titulo }}</h1>
+	<p class="text-muted small mb-4">{{ periodo.get_tipo_display }}</p>
+
+	{% if boletines_por_tipo %}
+		{% for tipo_label, lista in boletines_por_tipo.items %}
+		<section class="mb-4">
+			{% if boletines_por_tipo|length > 1 %}
+			<h2 class="h5 text-uppercase fw-bold mb-3">{{ tipo_label }}</h2>
+			{% endif %}
+			<div class="row g-3">
+				{% for boletin in lista %}
+				<div class="col-md-6 col-lg-4">
+					<div class="card h-100">
+						{% if boletin.imagen %}
+						<img src="{{ boletin.imagen.url }}" class="card-img-top" alt="{{ boletin.titulo }}">
+						{% endif %}
+						<div class="card-body">
+							<h3 class="h6 card-title">{{ boletin.titulo }}</h3>
+							{% if boletin.fecha %}
+							<p class="card-text small text-muted mb-2">{{ boletin.fecha|date:'d-m-Y' }}</p>
+							{% endif %}
+							{% if boletin.pdf %}
+							<a href="{{ boletin.pdf.url }}" target="_blank" rel="noopener"
+							   class="btn btn-sm btn-primary">
+								Descargar PDF
+							</a>
+							{% endif %}
+						</div>
+					</div>
+				</div>
+				{% endfor %}
+			</div>
+		</section>
+		{% endfor %}
+	{% else %}
+		<div class="alert alert-info">No hay boletines disponibles en este periodo.</div>
+	{% endif %}
+
+	<div class="mt-4 pt-3 border-top">
+		{% if periodo.tipo == 'marca' %}
+		<a href="{% url 'boletines:marcas' %}" class="btn btn-outline-secondary btn-sm">
+			&larr; Volver a boletines marca
+		</a>
+		{% else %}
+		<a href="{% url 'boletines:general' %}" class="btn btn-outline-secondary btn-sm">
+			&larr; Volver a boletines
+		</a>
+		{% endif %}
+	</div>
+</div>
+{% endblock %}

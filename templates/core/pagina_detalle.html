@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ pagina.titulo }} - DINAPI{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card p-4">
+                {% if pagina.imagen_principal %}
+                    <img src="{{ pagina.imagen_principal.url }}" class="img-fluid rounded mb-3" alt="{{ pagina.titulo }}">
+                {% endif %}
+
+                {% if pagina.contenido %}
+                    {{ pagina.contenido|safe }}
+                {% else %}
+                    <p class="text-muted mb-0">Esta pagina todavia no tiene contenido cargado.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card p-4">
+                <h5>Tipo de pagina</h5>
+                <p class="mb-3">{{ pagina.get_tipo_display }}</p>
+                <h6>Otras paginas</h6>
+                <div class="list-group">
+                    {% for p in paginas_menu %}
+                        <a href="{% url 'core:pagina_detalle' p.slug %}" class="list-group-item list-group-item-action {% if p.id == pagina.id %}active{% endif %}">
+                            {{ p.titulo }}
+                        </a>
+                    {% empty %}
+                        <span class="text-muted">Sin paginas de menu.</span>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

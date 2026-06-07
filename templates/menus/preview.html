@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}Vista previa Menus y Popups{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="mb-4">Vista previa de Menus y Popups</h1>
+
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h2 class="h5">Menu derecho</h2>
+                    <ul class="list-group list-group-flush">
+                        {% for item in enlaces_simples %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <a href="{{ item.url_resuelta }}" {% if item.link_externo %}target="_blank" rel="noopener"{% endif %}>{{ item.titulo }}</a>
+                                {% if item.destacado %}<span class="badge bg-warning text-dark">Destacado</span>{% endif %}
+                            </li>
+                        {% empty %}
+                            <li class="list-group-item text-muted">No hay enlaces simples.</li>
+                        {% endfor %}
+                    </ul>
+
+                    {% if padres %}
+                        <hr>
+                        <h3 class="h6">Menus padre</h3>
+                        <ul>
+                            {% for padre in padres %}
+                                <li>{{ padre.titulo }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+
+                    {% if hijos %}
+                        <h3 class="h6">Menus hijo</h3>
+                        <ul>
+                            {% for hijo in hijos %}
+                                <li>
+                                    <a href="{{ hijo.url_resuelta }}" {% if hijo.link_externo %}target="_blank" rel="noopener"{% endif %}>{{ hijo.titulo }}</a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h2 class="h5">Popup activo</h2>
+                    {% if popup_activo %}
+                        <p><strong>{{ popup_activo.titulo }}</strong></p>
+                        {% if popup_activo.descripcion %}
+                            <p>{{ popup_activo.descripcion }}</p>
+                        {% endif %}
+                        {% if popup_activo.imagen %}
+                            <img class="img-fluid rounded" src="{{ popup_activo.imagen.url }}" alt="{{ popup_activo.titulo }}">
+                        {% endif %}
+                        {% if popup_activo.url_video %}
+                            <p class="mt-3"><a href="{{ popup_activo.url_video }}" target="_blank" rel="noopener">Abrir video</a></p>
+                        {% endif %}
+                    {% else %}
+                        <p class="text-muted">No hay popup activo.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

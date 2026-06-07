@@ -1,0 +1,71 @@
+{# Partial del grid mensual — se usa en carga inicial y como fallback sin JS #}
+
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <a href="?year={{ prev_year }}&month={{ prev_month }}" class="btn btn-outline-secondary btn-sm cal-nav"
+     data-year="{{ prev_year }}" data-month="{{ prev_month }}">&#8249; Anterior</a>
+  <h2 class="h5 mb-0 fw-bold">{{ month_nombre }} {{ year }}</h2>
+  <a href="?year={{ next_year }}&month={{ next_month }}" class="btn btn-outline-secondary btn-sm cal-nav"
+     data-year="{{ next_year }}" data-month="{{ next_month }}">Siguiente &#8250;</a>
+</div>
+
+<table class="table table-bordered table-sm text-center calendario-grid">
+  <thead>
+    <tr>
+      <th class="text-uppercase small">Lun</th>
+      <th class="text-uppercase small">Mar</th>
+      <th class="text-uppercase small">Mié</th>
+      <th class="text-uppercase small">Jue</th>
+      <th class="text-uppercase small">Vie</th>
+      <th class="text-uppercase small">Sáb</th>
+      <th class="text-uppercase small">Dom</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for semana in semanas %}
+    <tr>
+      {% for dia in semana %}
+        {% if dia.numero %}
+          <td {% if dia.actividades %}class="fw-bold text-white bg-dinapi-red"{% endif %}>
+            <span>{{ dia.numero }}</span>
+            {% for act in dia.actividades %}
+              <div class="small mt-1">{{ act.titulo|truncatechars:30 }}</div>
+            {% endfor %}
+          </td>
+        {% else %}
+          <td class="text-muted bg-light"></td>
+        {% endif %}
+      {% endfor %}
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% if actividades %}
+  <h3 class="h6 fw-bold mt-4 mb-3">Actividades de {{ month_nombre }} {{ year }}</h3>
+  <ul class="list-group list-group-flush">
+    {% for act in actividades %}
+    <li class="list-group-item px-0">
+      <div class="d-flex gap-3">
+        <div class="text-center" style="min-width:3rem">
+          <span class="d-block fs-4 fw-bold text-dinapi-red">{{ act.fecha_inicio.day }}</span>
+        </div>
+        <div>
+          <strong>{{ act.titulo }}</strong>
+          {% if act.lugar %}
+            <br><small class="text-muted"><i class="bi bi-geo-alt"></i> {{ act.lugar }}</small>
+          {% endif %}
+          {% if act.descripcion %}
+            <p class="mb-0 mt-1 small">{{ act.descripcion|truncatewords:40 }}</p>
+          {% endif %}
+          <small class="text-muted">
+            {{ act.fecha_inicio|date:"d/m/Y H:i" }}
+            {% if act.fecha_fin %} — {{ act.fecha_fin|date:"d/m/Y H:i" }}{% endif %}
+          </small>
+        </div>
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p class="text-muted mt-3">No hay actividades registradas para este mes.</p>
+{% endif %}

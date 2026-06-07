@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}Busqueda de Noticias - DINAPI{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    {% if noticias %}
+        <div class="list-group">
+            {% for noticia in noticias %}
+                <a href="{% url 'noticias:detalle' noticia.slug %}" class="list-group-item list-group-item-action">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">{{ noticia.titulo }}</h5>
+                        <small>{{ noticia.fecha|date:'d/m/Y' }}</small>
+                    </div>
+                    <p class="mb-1">{{ noticia.get_epigrafe }}...</p>
+                    <small class="text-muted">Categoria: {{ noticia.categoria.nombre }}</small>
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-warning">
+            No se encontraron noticias para tu busqueda.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

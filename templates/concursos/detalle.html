@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ concurso.titulo }} - Concursos{% endblock %}
+
+{% block extra_css %}
+<style>
+    .concurso-detalle-page {
+        padding: 1.5rem 0 3rem;
+    }
+    .concurso-head {
+        background: #f4f6f8;
+        border-left: 6px solid #00529c;
+        padding: 0.85rem 1rem;
+        margin-bottom: 1rem;
+    }
+    .concurso-head h1 {
+        margin: 0;
+        font-size: 1.25rem;
+        color: #1b3242;
+        font-weight: 700;
+    }
+    .concurso-head p {
+        margin: 0.25rem 0 0;
+        font-size: 0.86rem;
+        color: #5e6b77;
+    }
+    .concurso-detalle-card {
+        border: 1px solid #e3e6ea;
+        box-shadow: 0 7px 18px rgba(0,0,0,.09);
+    }
+    .concurso-detalle-card .card-body {
+        padding: 1rem;
+    }
+    .concurso-detalle-card img {
+        max-width: 100%;
+        border-radius: 6px;
+        box-shadow: 0 4px 14px rgba(0,0,0,.14);
+    }
+    .concurso-actions .btn {
+        font-size: 0.82rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="concurso-detalle-page">
+    <div class="container my-0">
+        <div class="concurso-head">
+            <h1>{{ concurso.titulo }}</h1>
+            {% if concurso.fecha %}<p>{{ concurso.fecha|date:'d/m/Y' }}</p>{% endif %}
+        </div>
+    </div>
+
+<div class="container my-0">
+    <div class="card concurso-detalle-card">
+        <div class="card-body text-center">
+            {% if concurso.imagen_completa %}
+                <img src="{{ concurso.imagen_completa.url }}" class="img-fluid rounded" alt="{{ concurso.titulo }}">
+            {% elif concurso.imagen_corta %}
+                <img src="{{ concurso.imagen_corta.url }}" class="img-fluid rounded" alt="{{ concurso.titulo }}">
+            {% endif %}
+
+            {% if concurso.enlace %}
+                <div class="mt-4 concurso-actions">
+                    <a href="{{ concurso.enlace }}" target="_blank" rel="noopener" class="btn btn-info">
+                        Ver mas detalles
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="mt-4 concurso-actions">
+        <a href="{% url 'concursos:lista' %}" class="btn btn-outline-primary">Volver a concursos</a>
+    </div>
+</div>
+</div>
+{% endblock %}

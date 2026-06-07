@@ -1,0 +1,28 @@
+{# Partial: anuncios del home. Incluir con {% include "core/partials/_anuncios.html" %} #}
+{% if anuncios %}
+<section class="py-3">
+  <div class="row g-3">
+    {% for anuncio in anuncios %}
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="card h-100 border-0 shadow-sm">
+        {% if anuncio.imagen %}
+          <img src="{{ anuncio.imagen.url }}" class="card-img-top"
+               alt="{{ anuncio.titulo }}" style="height:180px; object-fit:cover;">
+        {% endif %}
+        <div class="card-body">
+          <h3 class="card-title h6 fw-bold">{{ anuncio.titulo }}</h3>
+          {% if anuncio.descripcion %}
+            <p class="card-text small text-muted">{{ anuncio.descripcion|truncatewords:25 }}</p>
+          {% endif %}
+          {% if anuncio.url %}
+            <a href="{{ anuncio.url }}" class="btn btn-outline-primary btn-sm mt-auto">
+              Ver más
+            </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}

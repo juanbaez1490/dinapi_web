@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body { font-family: Arial, sans-serif; background:#f4f4f4; margin:0; padding:0; }
+    .wrapper { max-width:600px; margin:30px auto; background:#fff; border-radius:6px; overflow:hidden; }
+    .header { background:#ef1f28; padding:24px 32px; text-align:center; }
+    .header img { max-height:52px; }
+    .header h2 { color:#fff; margin:12px 0 0; font-size:1.1rem; }
+    .body { padding:28px 32px; }
+    .body h3 { color:#1a2a3d; margin-top:0; }
+    .detail-row { border-bottom:1px solid #eee; padding:8px 0; font-size:.9rem; }
+    .detail-row strong { color:#333; display:inline-block; min-width:140px; }
+    .footer { background:#02539c; text-align:center; padding:14px; }
+    .footer p { color:#fff; font-size:.78rem; margin:0; }
+  </style>
+</head>
+<body>
+<div class="wrapper">
+  <div class="header">
+    <img src="{{ logo_url }}" alt="DINAPI">
+    <h2>Reclamo recibido</h2>
+  </div>
+  <div class="body">
+    <h3>Estimado/a {{ reclamo.nombre }},</h3>
+    <p>Su reclamo fue registrado exitosamente en el sistema de DINAPI. A continuacion el resumen:</p>
+
+    <div class="detail-row"><strong>N. de referencia:</strong> #{{ reclamo.pk }}</div>
+    <div class="detail-row"><strong>Tema:</strong> {{ reclamo.get_tema_display }}</div>
+    <div class="detail-row"><strong>Fecha de envio:</strong> {{ reclamo.fecha_envio|date:"d/m/Y H:i" }}</div>
+    {% if reclamo.expediente %}
+    <div class="detail-row"><strong>Expediente:</strong> {{ reclamo.expediente }}</div>
+    {% endif %}
+    <div class="detail-row" style="border:none; padding-top:12px;">
+      <strong>Descripcion:</strong><br>
+      <span style="color:#555;">{{ reclamo.descripcion }}</span>
+    </div>
+
+    <p style="margin-top:20px; color:#555; font-size:.88rem;">
+      Nuestro equipo revisara su reclamo y se comunicara con usted a la brevedad a traves de
+      <strong>{{ reclamo.email }}</strong>.
+    </p>
+  </div>
+  <div class="footer">
+    <p>DINAPI — Direccion Nacional de Propiedad Intelectual &bull; dinapi@dinapi.gov.py</p>
+  </div>
+</div>
+</body>
+</html>

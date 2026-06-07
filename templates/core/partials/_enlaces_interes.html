@@ -1,0 +1,25 @@
+{# Partial: accesos rápidos / enlaces de interés. Incluir con {% include "core/partials/_enlaces_interes.html" %} #}
+{% if enlaces_interes %}
+<section class="py-4 bg-light rounded-3 px-3">
+  <h2 class="h5 fw-bold mb-3 text-dinapi-blue">Accesos rápidos</h2>
+  <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 g-3">
+    {% for enlace in enlaces_interes %}
+    <div class="col">
+      <a href="{{ enlace.url }}" class="text-decoration-none">
+        <div class="card h-100 border-0 shadow-sm text-center p-3 hover-lift">
+          {% if enlace.icono %}
+            <i class="bi {{ enlace.icono }} fs-2 text-dinapi-red mb-2"></i>
+          {% endif %}
+          <div class="fw-semibold small">{{ enlace.titulo }}</div>
+          {% if enlace.descripcion %}
+            <p class="text-muted" style="font-size:.75rem; margin:0;">
+              {{ enlace.descripcion|truncatechars:60 }}
+            </p>
+          {% endif %}
+        </div>
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
