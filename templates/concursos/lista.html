@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+
+{% block title %}Concursos - DINAPI{% endblock %}
+
+{% block extra_css %}
+<style>
+    .concursos-page {
+        padding: 1.5rem 0 3rem;
+    }
+    .concursos-page .page-container {
+        max-width: 1140px;
+    }
+    .concursos-head {
+        background: #f4f6f8;
+        border-left: 6px solid #00529c;
+        padding: 0.85rem 1rem;
+        margin-bottom: 1rem;
+    }
+    .concursos-head h1 {
+        font-size: 1.3rem;
+        font-weight: 700;
+        margin: 0;
+        color: #1b3242;
+    }
+    .concursos-head p {
+        margin: 0.2rem 0 0;
+        color: #5a6672;
+        font-size: 0.88rem;
+    }
+    .concursos-wrap {
+        border: 1px solid #e3e6ea;
+        box-shadow: 0 6px 18px rgba(0,0,0,.08);
+    }
+    .concursos-wrap .card-body {
+        padding: 1rem;
+    }
+    .concursos-wrap .section-title {
+        font-size: 1.04rem;
+        font-weight: 700;
+        margin-bottom: 0.9rem;
+        color: #213247;
+    }
+    .concursos-wrap .accordion-button {
+        font-size: 0.93rem;
+        font-weight: 700;
+        color: #1d3043;
+    }
+    .concurso-card {
+        border: 0;
+        border-radius: 6px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0,0,0,.1);
+        height: 100%;
+    }
+    .concurso-card .card-img-top {
+        height: 170px;
+        object-fit: cover;
+    }
+    .concurso-card .img-placeholder {
+        height: 170px;
+        background: #e7edf3;
+        color: #8aa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.82rem;
+        font-weight: 600;
+    }
+    .concurso-card .card-title {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: #1f2e41;
+    }
+    .concurso-card .btn {
+        font-size: 0.78rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="concursos-page">
+    <div class="container page-container my-0">
+        <div class="concursos-head">
+            <h1>Concursos</h1>
+            <p>Convocatorias institucionales agrupadas por anio</p>
+        </div>
+    </div>
+
+<div class="container page-container my-0">
+    <div class="card concursos-wrap">
+        <div class="card-body">
+            <h2 class="section-title">Listado historico</h2>
+
+            {% if concursos_por_anio %}
+                <div class="accordion" id="accordionConcursos">
+                    {% for anio, concursos in concursos_por_anio.items %}
+                        <div class="accordion-item">
+                            <h3 class="accordion-header" id="heading{{ anio }}">
+                                <button
+                                    class="accordion-button {% if not forloop.first %}collapsed{% endif %}"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#collapse{{ anio }}"
+                                    aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}"
+                                    aria-controls="collapse{{ anio }}"
+                                >
+                                    {% if anio == 'Sin fecha' %}Sin fecha{% else %}Anio {{ anio }}{% endif %}
+                                </button>
+                            </h3>
+                            <div
+                                id="collapse{{ anio }}"
+                                class="accordion-collapse collapse {% if forloop.first %}show{% endif %}"
+                                aria-labelledby="heading{{ anio }}"
+                                data-bs-parent="#accordionConcursos"
+                            >
+                                <div class="accordion-body">
+                                    <div class="row">
+                                        {% for concurso in concursos %}
+                                            <div class="col-md-6 mb-4">
+                                                <div class="card concurso-card">
+                                                    <a href="{% url 'concursos:detalle' concurso.slug %}">
+                                                        {% if concurso.imagen_corta %}
+                                                            <img src="{{ concurso.imagen_corta.url }}" class="card-img-top" alt="{{ concurso.titulo }}">
+                                                        {% else %}
+                                                            <div class="img-placeholder">Sin imagen</div>
+                                                        {% endif %}
+                                                    </a>
+                                                    <div class="card-body d-flex flex-column">
+                                                        <h4 class="h6 card-title">{{ concurso.titulo }}</h4>
+                                                        {% if concurso.fecha %}
+                                                            <p class="text-muted mb-3">{{ concurso.fecha|date:'d/m/Y' }}</p>
+                                                        {% endif %}
+                                                        <a href="{% url 'concursos:detalle' concurso.slug %}" class="btn btn-outline-primary mt-auto">Ver concurso</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-info mb-0">No hay concursos disponibles.</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}

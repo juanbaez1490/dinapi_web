@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Calendario de Actividades — {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <!-- Encabezado -->
+  <div class="row mb-3">
+    <div class="col">
+      <h1 class="h3 text-dinapi-blue fw-bold">Calendario de Actividades</h1>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb small">
+          <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Inicio</a></li>
+          <li class="breadcrumb-item active">Calendario</li>
+        </ol>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Navegación de mes -->
+  <div id="calendario-container">
+    {% include "calendario/partial_mes.html" %}
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+  'use strict';
+
+  function loadMonth(year, month) {
+    const container = document.getElementById('calendario-container');
+    container.style.opacity = '0.5';
+
+    const url = "{% url 'calendario:actividades_json' %}?year=" + year + "&month=" + month;
+
+    fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+      .then(r => r.json())
+      .then(data => {
+        container.innerHTML = renderCalendario(data);
+        container.style.opacity = '1';
+        // Actualizar URL sin recargar
+        history.pushState(null, '', '?year=' + year + '&month=' + month);
+        bindNavLinks();
+      })
+      .catch(() => { container.style.opacity = '1'; });
+  }
+
+  function renderCalendario(d) {
+    // Construye el HTML del partial dinámicamente desde JSON
+    const diasNombre = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+
+    let html = '<div class="d-flex align-items-center justify-content-between mb-3">';
+    html += '<a href="#" class="btn btn-outline-secondary btn-sm cal-nav" data-year="' + d.prev_year + '" data-month="' + d.prev_month + '">&#8249; Anterior</a>';
+    html += '<h2 class="h5 mb-0 fw-bold">' + d.month_nombre + ' ' + d.year + '</h2>';
+    html += '<a href="#" class="btn btn-outline-secondary btn-sm cal-nav" data-year="' + d.next_year + '" data-month="' + d.next_month + '">Siguiente &#8250;</a>';
+    html += '</div>';
+
+    html += '<table class="table table-bordered table-sm text-center calendario-grid"><thead><tr>';
+    diasNombre.forEach(n => { html += '<th class="text-uppercase small">' + n + '</th>'; });
+    html += '</tr></thead><tbody>';
+
+    d.semanas.forEach(semana => {
+      html += '<tr>';
+      semana.forEach(dia => {
+        if (!dia.numero) {
+          html += '<td class="text-muted bg-light"></td>';
+        } else {
+          const tieneActs = dia.actividades && dia.actividades.length > 0;
+          html += '<td class="' + (tieneActs ? 'fw-bold text-white bg-dinapi-red' : '') + '">';
+          html += '<span>' + dia.numero + '</span>';
+          if (tieneActs) {
+            dia.actividades.forEach(a => {
+              html += '<div class="small mt-1">' + a.titulo + '</div>';
+            });
+          }
+          html += '</td>';
+        }
+      });
+      html += '</tr>';
+    });
+    html += '</tbody></table>';
+
+    // Lista de actividades
+    if (d.actividades && d.actividades.length > 0) {
+      html += '<h3 class="h6 fw-bold mt-4 mb-3">Actividades de ' + d.month_nombre + ' ' + d.year + '</h3>';
+      html += '<ul class="list-group list-group-flush">';
+      d.actividades.forEach(a => {
+        html += '<li class="list-group-item px-0">';
+        html += '<div class="d-flex gap-3">';
+        html += '<div class="text-center" style="min-width:3rem"><span class="d-block fs-4 fw-bold text-dinapi-red">' + a.dia + '</span></div>';
+        html += '<div><strong>' + a.titulo + '</strong>';
+        if (a.lugar) html += '<br><small class="text-muted"><i class="bi bi-geo-alt"></i> ' + a.lugar + '</small>';
+        if (a.descripcion) html += '<p class="mb-0 mt-1 small">' + a.descripcion + '</p>';
+        html += '</div></div></li>';
+      });
+      html += '</ul>';
+    } else {
+      html += '<p class="text-muted mt-3">No hay actividades registradas para este mes.</p>';
+    }
+
+    return html;
+  }
+
+  function bindNavLinks() {
+    document.querySelectorAll('.cal-nav').forEach(link => {
+      link.addEventListener('click', function (e) {
+        e.preventDefault();
+        loadMonth(this.dataset.year, this.dataset.month);
+      });
+    });
+  }
+
+  bindNavLinks();
+})();
+</script>
+{% endblock %}

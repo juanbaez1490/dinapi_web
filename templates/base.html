@@ -1,17 +1,21 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}DINAPI - Dirección Nacional de Propiedad Intelectual{% endblock %}</title>
+    <title>{% block title %}{% if site_config %}{{ site_config.titulo_sitio }}{% else %}DINAPI{% endif %} - Dirección Nacional de Propiedad Intelectual{% endblock %}</title>
     
     <!-- SEO Meta Tags -->
-    <meta name="description" content="La DINAPI es el ente público que diseña, implementa y fomenta las políticas de propiedad intelectual en el Paraguay">
+    <meta name="description" content="{% if site_config and site_config.descripcion %}{{ site_config.descripcion }}{% else %}La DINAPI es el ente público que diseña, implementa y fomenta las políticas de propiedad intelectual en el Paraguay{% endif %}">
     <meta name="keywords" content="propiedad intelectual, derecho de autor, observancia, patentes">
     
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -19,48 +23,203 @@
     <!-- Custom CSS -->
     <style>
         :root {
-            --primary-color: #114875;
-            --secondary-color: #00529C;
-            --light-bg: #f5f5f5;
+            --dinapi-red: #b3132f;
+            --dinapi-red-dark: #8f0f25;
+            --dinapi-blue: #00529c;
+            --dinapi-blue-deep: #183246;
+            --dinapi-gold: #ffc31b;
+            --dinapi-green: #8cc63e;
+            --light-bg: #ececec;
+            --ink: #1d2530;
         }
         
         body {
-            font-family: 'Arial', sans-serif;
-            color: #333;
+            font-family: 'Barlow', sans-serif;
+            color: var(--ink);
+            background: var(--light-bg);
+            font-size: 15px;
+            line-height: 1.45;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Barlow', sans-serif;
+            color: #1f2c3b;
+            letter-spacing: 0.005em;
+            margin-top: 0;
+        }
+
+        h1 {
+            font-weight: 800;
+        }
+
+        h2, h3 {
+            font-weight: 700;
+        }
+
+        p, li, small {
+            color: #334354;
+        }
+
+        .section-heading {
+            font-size: 1.45rem;
+            font-weight: 800;
+            color: #1a2a3d;
+            margin-bottom: 1rem;
+        }
+
+        .site-masthead {
+            background: #ececec;
+            padding-top: 0.5rem;
+            padding-bottom: 0.45rem;
+            border-bottom: 1px solid #d8d8d8;
+        }
+
+        .site-masthead .masthead-shell {
+            max-width: 1140px;
+        }
+
+        .site-masthead .masthead-logo {
+            max-height: 66px;
+            width: auto;
+        }
+
+        .site-search {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .site-search .form-control {
+            border-radius: 999px;
+            border: 1px solid #d2d2d2;
+            background: #f4f4f4;
+            font-size: 0.83rem;
+            padding: 0.35rem 0.9rem;
+            width: 170px;
+        }
+
+        .site-search .btn {
+            border: 0;
+            border-radius: 999px;
+            color: #37424c;
+            background: transparent;
+            font-size: 0.75rem;
+            line-height: 1;
+            padding: 0.35rem 0.45rem;
         }
         
         .navbar-custom {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            background: #ef1f28;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.09);
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+
+        .navbar-custom .navbar-shell {
+            max-width: 1140px;
         }
         
         .navbar-custom .navbar-brand {
-            font-weight: bold;
-            font-size: 1.5rem;
+            font-weight: 800;
+            font-size: 1.28rem;
+            letter-spacing: 0.03em;
+            margin-right: 1rem;
+            padding-top: 0.65rem;
+            padding-bottom: 0.65rem;
         }
         
         .navbar-custom .nav-link {
             transition: all 0.3s ease;
-            margin: 0 10px;
+            font-weight: 600;
+            letter-spacing: 0.01em;
+            padding: 0;
+            white-space: nowrap;
+        }
+
+        .navbar-custom .navbar-nav > .nav-item {
+            border-right: 0;
+            min-height: 32px;
+            padding: 0 0.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-custom .navbar-nav > .nav-item:last-child {
+            border-right: 0;
+        }
+
+        .navbar-custom .navbar-nav > .nav-item > .nav-link {
+            color: #f5f5f3;
+            line-height: 1.15;
+            font-size: 0.69rem;
+            font-weight: 500;
         }
         
-        .navbar-custom .nav-link:hover {
-            opacity: 0.8;
-            transform: translateY(-2px);
+        .navbar-custom .navbar-nav > .nav-item > .nav-link:hover {
+            color: #ffffff;
+            transform: translateY(-1px);
         }
-        
-        .hero-section {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-            color: white;
-            padding: 60px 20px;
-            text-align: center;
-            margin-bottom: 40px;
+
+        .navbar-custom .navbar-nav > .nav-item > .nav-link.active {
+            color: #ffffff;
+            font-weight: 700;
+            box-shadow: inset 0 -3px 0 rgba(255, 255, 255, 0.75);
         }
-        
-        .hero-section h1 {
-            font-size: 2.5rem;
-            font-weight: bold;
-            margin-bottom: 20px;
+
+        .navbar-custom .nav-link.menu-destacado {
+            color: var(--dinapi-gold) !important;
+            font-weight: 700;
+        }
+
+        .navbar-custom .dropdown-menu {
+            background-color: var(--dinapi-red);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 0 0 6px 6px;
+            box-shadow: 0 14px 28px rgba(0, 0, 0, 0.22);
+            min-width: 13rem;
+            margin-top: 0;
+            padding: 0.2rem 0;
+            z-index: 1080;
+        }
+
+        .navbar-custom .dropdown-item {
+            font-weight: 500;
+            text-align: left;
+            padding: 0.55rem 1rem;
+            color: #ffffff;
+            background: transparent;
+        }
+
+        .navbar-custom .dropdown-toggle::after {
+            margin-left: 0.35rem;
+            vertical-align: 0.1em;
+        }
+
+        .navbar-custom .dropdown-item:hover,
+        .navbar-custom .dropdown-item:focus {
+            background: var(--dinapi-red-dark);
+            color: #ffffff;
+        }
+
+        .navbar-custom .dropdown-item.menu-destacado {
+            color: var(--dinapi-gold);
+            font-weight: 700;
+        }
+
+        @media (min-width: 992px) {
+            .navbar-custom .nav-item.dropdown {
+                position: relative;
+            }
+
+            .navbar-custom .nav-item.dropdown > .dropdown-menu,
+            .navbar-custom .nav-item.dropdown > .dropdown-menu[data-bs-popper] {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: auto;
+                margin-top: 0;
+            }
         }
         
         .card {
@@ -75,29 +234,128 @@
         }
         
         .btn-primary {
-            background-color: var(--secondary-color);
-            border-color: var(--secondary-color);
+            background-color: var(--dinapi-blue);
+            border-color: var(--dinapi-blue);
         }
         
         .btn-primary:hover {
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
+            background-color: var(--dinapi-red);
+            border-color: var(--dinapi-red);
+        }
+
+        .btn {
+            border-radius: 0.2rem;
+            font-weight: 600;
+            letter-spacing: 0.01em;
+            padding: 0.5rem 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-outline-primary {
+            border-color: #00529c;
+            color: #00529c;
+            background: transparent;
+        }
+
+        .btn-outline-primary:hover,
+        .btn-outline-primary:focus {
+            color: #fff;
+            background: #00529c;
+            border-color: #00529c;
+        }
+
+        .btn-outline-secondary {
+            border-color: #6e7883;
+            color: #4f5b68;
+            background: #fff;
+        }
+
+        .btn-outline-secondary:hover,
+        .btn-outline-secondary:focus {
+            color: #fff;
+            background: #4f5b68;
+            border-color: #4f5b68;
         }
         
-        footer {
-            background-color: var(--primary-color);
-            color: white;
-            margin-top: 60px;
+        .legacy-footer {
+            background: #fcfcfc;
+            border-top: 1px solid #e4e4e4;
+            margin-top: 2rem;
         }
-        
-        footer a {
-            color: #ccc;
+
+        .legacy-footer .footer-main {
+            max-width: 1140px;
+            padding-top: 2.4rem;
+            padding-bottom: 2.4rem;
+        }
+
+        .legacy-footer .footer-title {
+            font-size: 2rem;
+            color: #2c2c2c;
+            font-weight: 500;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+
+        .legacy-footer .footer-text,
+        .legacy-footer .footer-text a {
+            font-size: 0.8rem;
+            color: #555;
             text-decoration: none;
-            transition: color 0.3s ease;
         }
-        
-        footer a:hover {
-            color: white;
+
+        .legacy-footer .footer-text a:hover {
+            color: #00529c;
+            text-decoration: underline;
+        }
+
+        .legacy-footer .footer-social {
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+        }
+
+        .legacy-footer .footer-social a {
+            color: #114874;
+        }
+
+        .legacy-footer .interest-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .legacy-footer .interest-list li {
+            border-bottom: 1px solid #cfcfcf;
+            padding: 0.56rem 0;
+        }
+
+        .legacy-footer .interest-list a {
+            color: #6a6a6a;
+            font-size: 0.78rem;
+            text-decoration: none;
+        }
+
+        .legacy-footer .interest-list a:hover {
+            color: #00529c;
+        }
+
+        .legacy-footer .footer-bottom {
+            background: #02539c;
+            text-align: center;
+            padding: 0.75rem 0.6rem;
+        }
+
+        .legacy-footer .footer-bottom a {
+            color: #fff;
+            font-size: 0.78rem;
+            text-decoration: none;
+        }
+
+        .legacy-footer .footer-bottom a:hover {
+            text-decoration: underline;
         }
         
         .alert-success {
@@ -117,14 +375,107 @@
             border-color: #f5c6cb;
             color: #721c24;
         }
+
+        @media (max-width: 991.98px) {
+            .site-masthead .masthead-logo {
+                max-height: 48px;
+            }
+
+            .site-search {
+                justify-content: flex-start;
+                margin-top: 0.45rem;
+            }
+
+            .site-search .form-control {
+                width: 100%;
+                max-width: 220px;
+            }
+
+            .navbar-custom {
+                padding-top: 0.35rem;
+                padding-bottom: 0.35rem;
+            }
+
+            .navbar-custom .navbar-brand {
+                padding-top: 0.35rem;
+                padding-bottom: 0.35rem;
+                font-size: 1.1rem;
+            }
+
+            .navbar-custom .navbar-nav > .nav-item {
+                border: 0;
+                min-height: auto;
+                padding: 0;
+            }
+
+            .navbar-custom .navbar-nav > .nav-item > .nav-link {
+                padding: 0.5rem 0;
+                font-size: 0.92rem;
+            }
+
+            .navbar-custom .dropdown-menu {
+                background-color: var(--dinapi-red);
+                box-shadow: none;
+                min-width: 100%;
+                border: 0;
+                border-left: 2px solid rgba(255, 255, 255, 0.3);
+                border-radius: 0;
+                position: static;
+            }
+
+            .navbar-custom .navbar-nav > .nav-item > .nav-link.active {
+                box-shadow: none;
+                background: rgba(0, 0, 0, 0.2);
+                border-radius: 4px;
+                padding: 0.25rem 0.5rem;
+            }
+
+            .navbar-menu-divider {
+                border-color: rgba(255, 255, 255, 0.25);
+                margin: 0.35rem 0;
+                opacity: 1;
+            }
+
+            .legacy-footer .footer-title {
+                font-size: 1.7rem;
+            }
+
+            .legacy-footer .interest-col {
+                margin-top: 1rem;
+            }
+        }
     </style>
     
     {% block extra_css %}{% endblock %}
 </head>
 <body>
+    <header class="site-masthead">
+        <div class="container masthead-shell">
+            <div class="row align-items-center">
+                <div class="col-md-7 col-lg-7">
+                    <a href="/" aria-label="DINAPI">
+                        {% if site_config and site_config.logo %}
+                        <img src="{{ site_config.logo.url }}" class="img-fluid masthead-logo" alt="{{ site_config.titulo_sitio }}">
+                        {% else %}
+                        <img src="{% static 'img/header/logo_nacional.png' %}" class="img-fluid masthead-logo" alt="Direccion Nacional de Propiedad Intelectual">
+                        {% endif %}
+                    </a>
+                </div>
+                <div class="col-md-5 col-lg-5">
+                    <form class="site-search" action="{% url 'noticias:buscar' %}" method="get">
+                        <input class="form-control" type="search" placeholder="Buscar" aria-label="Buscar" name="q">
+                        <button class="btn" type="submit" aria-label="Buscar">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </header>
+
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark navbar-custom sticky-top">
-        <div class="container">
+        <div class="container navbar-shell">
             <a class="navbar-brand" href="/">
                 <i class="fas fa-shield-alt"></i> DINAPI
             </a>
@@ -132,22 +483,72 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="/" aria-label="Inicio">
+                            <i class="fas fa-home"></i><span class="d-lg-none ms-1">Inicio</span>
+                        </a>
+                    </li>
+                    {% for item in menu_principal_simples %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if item.url != '/' and item.url in request.path or request.path == item.url %}active{% endif %}"
+                           href="{{ item.url }}"
+                           {% if item.url != '/' and item.url in request.path or request.path == item.url %}aria-current="page"{% endif %}>
+                            {{ item.pagina.titulo }}
+                        </a>
+                    </li>
+                    {% endfor %}
+                    {% for grupo in menu_principal_grupos %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle {% if grupo.url != '/' and grupo.url in request.path %}active{% endif %}"
+                           href="{{ grupo.url }}"
+                           id="menuPrincipalPadre{{ grupo.padre.id }}"
+                           role="button"
+                           data-bs-toggle="dropdown"
+                           aria-expanded="false"
+                           {% if grupo.url != '/' and grupo.url in request.path %}aria-current="true"{% endif %}>
+                            {{ grupo.padre.titulo }}
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="menuPrincipalPadre{{ grupo.padre.id }}">
+                            <li>
+                                <a class="dropdown-item fw-semibold border-bottom pb-1" href="{{ grupo.url }}">
+                                    <i class="fas fa-angle-right fa-xs me-1"></i> Ver seccion
+                                </a>
+                            </li>
+                            {% for hijo in grupo.hijos %}
+                            <li>
+                                <a class="dropdown-item {% if hijo.nivel > 1 %}ps-4 small{% endif %}" href="{{ hijo.url }}">
+                                    {% if hijo.nivel > 1 %}<span class="me-1" aria-hidden="true">▹</span>{% endif %}{{ hijo.pagina.titulo }}
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                    {% endfor %}
+                </ul>
+                <hr class="navbar-menu-divider d-lg-none">
                 <ul class="navbar-nav ms-auto">
+                    {% for item in menu_derecho_simples %}
                     <li class="nav-item">
-                        <a class="nav-link" href="/">
-                            <i class="fas fa-home"></i> Inicio
-                        </a>
+                        <a class="nav-link {% if item.destacado %}menu-destacado{% endif %}" href="{{ item.url_resuelta }}" {% if item.link_externo %}target="_blank" rel="noopener"{% endif %}>{{ item.titulo }}</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'noticias:lista' %}">
-                            <i class="fas fa-newspaper"></i> Noticias
+                    {% endfor %}
+                    {% for grupo in menu_derecho_grupos %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle {% if grupo.padre.destacado %}menu-destacado{% endif %}" href="#" id="menuPadre{{ grupo.padre.id }}" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            {{ grupo.padre.titulo }}
                         </a>
+                        <ul class="dropdown-menu" aria-labelledby="menuPadre{{ grupo.padre.id }}">
+                            {% for hijo in grupo.hijos %}
+                            <li>
+                                <a class="dropdown-item {% if hijo.destacado %}menu-destacado{% endif %}" href="{{ hijo.url_resuelta }}" {% if hijo.link_externo %}target="_blank" rel="noopener"{% endif %}>{{ hijo.titulo }}</a>
+                            </li>
+                            {% empty %}
+                            <li><span class="dropdown-item-text text-muted">Sin enlaces</span></li>
+                            {% endfor %}
+                        </ul>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'contacto:contact' %}">
-                            <i class="fas fa-envelope"></i> Contacto
-                        </a>
-                    </li>
+                    {% endfor %}
                 </ul>
             </div>
         </div>
@@ -170,45 +571,154 @@
         {% block content %}{% endblock %}
     </main>
 
+    {% if popup_activo %}
+    <div class="modal fade" id="popupInfoModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">{{ popup_activo.titulo|default:'Informacion' }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    {% if popup_activo.descripcion %}
+                    <p>{{ popup_activo.descripcion }}</p>
+                    {% endif %}
+                    {% if popup_activo.imagen %}
+                    <img src="{{ popup_activo.imagen.url }}" class="img-fluid rounded" alt="{{ popup_activo.titulo }}">
+                    {% endif %}
+                    {% if popup_activo.url_video %}
+                    <p class="mt-3 mb-0">
+                        <a href="{{ popup_activo.url_video }}" target="_blank" rel="noopener">Ver video</a>
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
     <!-- Footer -->
-    <footer class="py-5 mt-5">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-4 mb-4">
-                    <h5>
-                        <i class="fas fa-shield-alt"></i> DINAPI
-                    </h5>
-                    <p class="text-muted">
-                        Dirección Nacional de Propiedad Intelectual
-                    </p>
+    <footer class="legacy-footer">
+        <div class="container footer-main">
+            <div class="row g-4">
+                <div class="col-lg-5 col-md-6">
+                    <h3 class="footer-title">Contacto</h3>
+                    <div class="footer-text">
+                        <p class="mb-1">Tel: {% if site_config and site_config.telefono %}{{ site_config.telefono }}{% else %}+595 21 216 7000{% endif %}</p>
+                        <p class="mb-1">Email: {% if site_config and site_config.email_contacto %}{{ site_config.email_contacto }}{% else %}dinapi@dinapi.gov.py{% endif %}</p>
+                        <p class="mb-1">Direccion: {% if site_config and site_config.direccion %}{{ site_config.direccion }}{% else %}Espana 323 casi Estados Unidos{% endif %}</p>
+                        <p class="mb-1">
+                            {% if site_config and site_config.url_consultas %}
+                                <a href="{{ site_config.url_consultas }}">Consultas, Reclamos y Sugerencias</a>
+                            {% else %}
+                                <a href="{% url 'reclamos:formulario' %}">Consultas, Reclamos y Sugerencias</a>
+                            {% endif %}
+                        </p>
+                        <p class="mb-1">
+                            {% if site_config and site_config.url_horarios %}
+                                <a href="{{ site_config.url_horarios }}" target="_blank" rel="noopener">Horarios de atencion (Ver mas)</a>
+                            {% else %}
+                                <a href="{% url 'core:pagina_detalle' slug='horarios-de-atencion' %}">Horarios de atencion (Ver mas)</a>
+                            {% endif %}
+                        </p>
+                        <p class="mb-0">Republica del Paraguay</p>
+                    </div>
+
+                    <div class="footer-social">
+                        {% with fb=site_config.url_facebook|default:"https://www.facebook.com/DinapiPy/" %}
+                        <a href="{{ fb }}" target="_blank" rel="noopener" aria-label="Facebook"><i class="fab fa-facebook-square"></i></a>
+                        {% endwith %}
+                        {% with ig=site_config.url_instagram|default:"https://www.instagram.com/dinapi_py/?hl=es-la" %}
+                        <a href="{{ ig }}" target="_blank" rel="noopener" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        {% endwith %}
+                        {% with yt=site_config.url_youtube|default:"https://www.youtube.com/@dinapi_py/videos" %}
+                        <a href="{{ yt }}" target="_blank" rel="noopener" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                        {% endwith %}
+                        {% with tw=site_config.url_twitter|default:"https://twitter.com/dinapipy" %}
+                        <a href="{{ tw }}" target="_blank" rel="noopener" aria-label="X"><i class="fa-brands fa-x-twitter"></i></a>
+                        {% endwith %}
+                    </div>
                 </div>
-                <div class="col-md-4 mb-4">
-                    <h5>Enlaces</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="/">Inicio</a></li>
-                        <li><a href="{% url 'noticias:lista' %}">Noticias</a></li>
-                        <li><a href="{% url 'contacto:contact' %}">Contacto</a></li>
-                    </ul>
-                </div>
-                <div class="col-md-4 mb-4">
-                    <h5>Contacto</h5>
-                    <p class="text-muted">
-                        <i class="fas fa-envelope"></i> contacto@dinapi.gov.py<br>
-                        <i class="fas fa-phone"></i> +595 21 2580000<br>
-                        <i class="fas fa-map-marker-alt"></i> Paraguay
-                    </p>
+
+                <div class="col-lg-7 col-md-6">
+                    <h3 class="footer-title">Enlaces de Interes</h3>
+                    <div class="row">
+                        <div class="col-6 interest-col">
+                            <ul class="interest-list">
+                                <li><a href="https://www.paraguay.gov.py/" target="_blank" rel="noopener">Portal Paraguay</a></li>
+                                <li><a href="https://www.wipo.int/portal/es/" target="_blank" rel="noopener">OMPI</a></li>
+                                <li><a href="http://prosur.org/" target="_blank" rel="noopener">PROSUR</a></li>
+                                <li><a href="https://www.uspto.gov/" target="_blank" rel="noopener">USPTO</a></li>
+                                <li><a href="https://www.inta.org" target="_blank" rel="noopener">INTA</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-6 interest-col">
+                            <ul class="interest-list">
+                                <li><a href="http://www.oepm.es/es/" target="_blank" rel="noopener">OEPM</a></li>
+                                <li><a href="https://euipo.europa.eu/ohimportal/es" target="_blank" rel="noopener">EUIPO</a></li>
+                                <li><a href="http://www.kipi.or.kr/cmm/main/mainEng.do" target="_blank" rel="noopener">KIPI</a></li>
+                                <li><a href="https://www.asipi.org/" target="_blank" rel="noopener">ASIPI</a></li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <hr class="bg-light">
-            <div class="text-center text-muted">
-                <p>&copy; 2026 DINAPI. Todos los derechos reservados.</p>
-            </div>
+        </div>
+        <div class="footer-bottom">
+            <a href="https://www.paraguay.gov.py/guia-estandar" target="_blank" rel="noopener">Basado en la Guia estandar para sitios web del Gobierno</a>
         </div>
     </footer>
 
     <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    {% block extra_js %}{% endblock %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var isDesktop = function () { return window.innerWidth >= 992; };
+            var dropdowns = document.querySelectorAll('.navbar-custom .nav-item.dropdown');
+
+            dropdowns.forEach(function (dd) {
+                var toggle = dd.querySelector(':scope > .dropdown-toggle');
+                var menu = dd.querySelector(':scope > .dropdown-menu');
+                if (!toggle || !menu) { return; }
+
+                // Desktop: hover open/close
+                dd.addEventListener('mouseenter', function () {
+                    if (!isDesktop()) { return; }
+                    toggle.classList.add('show');
+                    menu.classList.add('show');
+                    toggle.setAttribute('aria-expanded', 'true');
+                });
+                dd.addEventListener('mouseleave', function () {
+                    if (!isDesktop()) { return; }
+                    toggle.classList.remove('show');
+                    menu.classList.remove('show');
+                    toggle.setAttribute('aria-expanded', 'false');
+                });
+
+                // Desktop: clicking the parent link navigates to its href
+                toggle.addEventListener('click', function (e) {
+                    if (!isDesktop()) { return; }
+                    var href = toggle.getAttribute('href');
+                    if (href && href !== '#') {
+                        e.preventDefault();
+                        e.stopImmediatePropagation();
+                        window.location.href = href;
+                    }
+                }, true);
+            });
+        });
+    </script>
+    {% if popup_activo %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var popupModal = new bootstrap.Modal(document.getElementById('popupInfoModal'), {
+                backdrop: true,
+                keyboard: true
+            });
+            popupModal.show();
+        });
+    </script>
+    {% endif %}
+
 </body>
 </html>

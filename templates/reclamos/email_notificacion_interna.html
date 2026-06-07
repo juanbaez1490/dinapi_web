@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body { font-family: Arial, sans-serif; background:#f4f4f4; margin:0; padding:0; }
+    .wrapper { max-width:600px; margin:30px auto; background:#fff; border-radius:6px; overflow:hidden; }
+    .header { background:#1a2a3d; padding:18px 28px; }
+    .header h2 { color:#fff; margin:0; font-size:1rem; }
+    .body { padding:24px 28px; }
+    .detail-row { border-bottom:1px solid #eee; padding:7px 0; font-size:.9rem; }
+    .detail-row strong { color:#333; display:inline-block; min-width:140px; }
+    .badge { display:inline-block; background:#ef1f28; color:#fff; border-radius:4px; padding:2px 8px; font-size:.8rem; }
+  </style>
+</head>
+<body>
+<div class="wrapper">
+  <div class="header">
+    <h2>[Nuevo Reclamo #{{ reclamo.pk }}] {{ reclamo.get_tema_display }}</h2>
+  </div>
+  <div class="body">
+    <div class="detail-row"><strong>N. referencia:</strong> #{{ reclamo.pk }}</div>
+    <div class="detail-row"><strong>Estado:</strong> <span class="badge">{{ reclamo.get_estado_display }}</span></div>
+    <div class="detail-row"><strong>Nombre:</strong> {{ reclamo.nombre }}</div>
+    <div class="detail-row"><strong>Email:</strong> {{ reclamo.email }}</div>
+    {% if reclamo.telefono %}
+    <div class="detail-row"><strong>Telefono:</strong> {{ reclamo.telefono }}</div>
+    {% endif %}
+    {% if reclamo.expediente %}
+    <div class="detail-row"><strong>Expediente:</strong> {{ reclamo.expediente }}</div>
+    {% endif %}
+    <div class="detail-row"><strong>Tema:</strong> {{ reclamo.get_tema_display }}</div>
+    <div class="detail-row"><strong>Fecha:</strong> {{ reclamo.fecha_envio|date:"d/m/Y H:i" }}</div>
+    {% if reclamo.adjunto %}
+    <div class="detail-row"><strong>Adjunto:</strong> {{ reclamo.adjunto.name }}</div>
+    {% endif %}
+    <div class="detail-row" style="border:none; padding-top:10px;">
+      <strong>Descripcion:</strong><br>
+      <span style="color:#444;">{{ reclamo.descripcion }}</span>
+    </div>
+  </div>
+</div>
+</body>
+</html>

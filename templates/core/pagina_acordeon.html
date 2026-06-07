@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ pagina.titulo }} - DINAPI{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+	<div class="row g-4">
+		<div class="col-lg-9">
+			<article class="acordeon-page">
+
+				<h1 class="mb-3">{{ pagina.titulo }}</h1>
+
+				{% if pagina.imagen_principal %}
+				<img src="{{ pagina.imagen_principal.url }}" class="img-fluid rounded mb-4" alt="{{ pagina.titulo }}">
+				{% endif %}
+
+				{# Bloque 1: contenido superior + items desplegables del AcordeonPage #}
+				{% if acordeon.contenido_superior or acordeon_items %}
+				<section class="mb-4">
+					{% if acordeon.contenido_superior %}
+					<div class="acordeon-contenido-superior mb-3">
+						{{ acordeon.contenido_superior|safe }}
+					</div>
+					{% endif %}
+
+					{% if acordeon_items %}
+					<div class="accordion" id="acordeon-publico-{{ pagina.legacy_id }}">
+						{% for item in acordeon_items %}
+						<div class="accordion-item">
+							<h2 class="accordion-header" id="heading-pub-{{ item.legacy_id }}">
+								<button class="accordion-button collapsed" type="button"
+								        data-bs-toggle="collapse"
+								        data-bs-target="#collapse-pub-{{ item.legacy_id }}"
+								        aria-expanded="false"
+								        aria-controls="collapse-pub-{{ item.legacy_id }}">
+									{{ item.titulo }}
+								</button>
+							</h2>
+							<div id="collapse-pub-{{ item.legacy_id }}"
+							     class="accordion-collapse collapse"
+							     aria-labelledby="heading-pub-{{ item.legacy_id }}"
+							     data-bs-parent="#acordeon-publico-{{ pagina.legacy_id }}">
+								<div class="accordion-body">
+									{% if item.contenido %}{{ item.contenido|safe }}{% endif %}
+									{% if item.adjunto %}
+									<a href="{{ item.adjunto.url }}" target="_blank" rel="noopener"
+									   class="btn btn-sm btn-primary mt-2">
+										{{ item.titulo_adjunto|default:'Descargar adjunto' }}
+									</a>
+									{% endif %}
+								</div>
+							</div>
+						</div>
+						{% endfor %}
+					</div>
+					{% endif %}
+				</section>
+				{% endif %}
+
+				{# Bloque 2: contenido del SiteTree legacy (HTML con sus propios acordeones BS5) #}
+				{% if pagina.contenido %}
+				<section class="acordeon-contenido-legacy mb-4">
+					{{ pagina.contenido|safe }}
+				</section>
+				{% endif %}
+
+				{# Bloque 3: contenido inferior + anexo #}
+				{% if acordeon.contenido_inferior %}
+				<section class="acordeon-contenido-inferior mb-3">
+					{{ acordeon.contenido_inferior|safe }}
+				</section>
+				{% endif %}
+
+				{% if acordeon.anexo %}
+				<div class="mb-4">
+					<a href="{{ acordeon.anexo.url }}" target="_blank" rel="noopener"
+					   class="btn btn-secondary">
+						{{ acordeon.titulo_anexo|default:'Descargar anexo' }}
+					</a>
+				</div>
+				{% endif %}
+
+			</article>
+		</div>
+
+		<aside class="col-lg-3">
+			<div class="card p-3">
+				<h6 class="text-uppercase small fw-bold text-muted mb-2">Otras paginas</h6>
+				<div class="list-group list-group-flush">
+					{% for p in paginas_menu %}
+					<a href="{% url 'core:pagina_detalle' p.slug %}"
+					   class="list-group-item list-group-item-action px-2 {% if p.id == pagina.id %}active{% endif %}">
+						{{ p.titulo }}
+					</a>
+					{% empty %}
+					<span class="text-muted small">Sin paginas de menu.</span>
+					{% endfor %}
+				</div>
+			</div>
+		</aside>
+	</div>
+</div>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ item.titulo }} - Biblioteca{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            {% if item.imagen_principal %}
+                <img src="{{ item.imagen_principal.url }}" class="img-fluid rounded mb-4" alt="{{ item.titulo }}">
+            {% endif %}
+
+            {% if item.descripcion %}
+                <div class="mb-4">{{ item.descripcion|safe }}</div>
+            {% endif %}
+
+            {% if item.enlaces_referencias %}
+                <h5>Enlaces y referencias</h5>
+                <div>{{ item.enlaces_referencias|safe }}</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a href="{% url 'biblioteca:lista' %}" class="btn btn-outline-primary">Volver a biblioteca</a>
+    </div>
+</div>
+{% endblock %}

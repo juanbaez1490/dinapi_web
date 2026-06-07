@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block title %}Tarjetas - DINAPI{% endblock %}
+
+{% block extra_css %}
+<style>
+    .tarjetas-page {
+        padding: 1.5rem 0 3rem;
+    }
+    .tarjetas-head {
+        background: #f4f6f8;
+        border-left: 6px solid #00529c;
+        padding: 0.85rem 1rem;
+        margin-bottom: 1rem;
+    }
+    .tarjetas-head h1 {
+        margin: 0;
+        font-size: 1.25rem;
+        color: #1b3242;
+        font-weight: 700;
+    }
+    .tarjetas-head p {
+        margin: 0.2rem 0 0;
+        font-size: 0.87rem;
+        color: #5c6874;
+    }
+    .tarjeta-seccion {
+        margin-bottom: 1.2rem;
+    }
+    .tarjeta-seccion h2 {
+        font-size: 1.02rem;
+        text-transform: uppercase;
+        font-weight: 700;
+        color: #203447;
+        border-bottom: 2px solid #dce5ee;
+        padding-bottom: 0.35rem;
+    }
+    .tarjeta-card {
+        border: 0;
+        border-radius: 7px;
+        overflow: hidden;
+        box-shadow: 0 3px 12px rgba(0,0,0,.11);
+        height: 100%;
+    }
+    .tarjeta-card .card-img-top {
+        height: 190px;
+        object-fit: cover;
+    }
+    .tarjeta-card .card-body {
+        padding: 0.85rem;
+    }
+    .tarjeta-card .card-title {
+        font-size: 0.91rem;
+        font-weight: 700;
+        color: #1f2f42;
+    }
+    .tarjeta-card .btn {
+        font-size: 0.78rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="tarjetas-page">
+    <div class="container my-0">
+        <div class="tarjetas-head">
+            <h1>Tarjetas</h1>
+            <p>Accesos directos y contenidos destacados</p>
+        </div>
+    </div>
+
+<div class="container my-0">
+    {% for pagina in paginas_tarjetas %}
+        <div class="tarjeta-seccion">
+            {% if pagina.titulo %}
+                <h2 class="mb-3">{{ pagina.titulo }}</h2>
+            {% endif %}
+            <div class="row g-3">
+                {% for tarjeta in pagina.tarjetas.all %}
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <div class="card tarjeta-card">
+                            {% if tarjeta.imagen %}
+                                <img src="{{ tarjeta.imagen.url }}" class="card-img-top" alt="{{ tarjeta.titulo }}">
+                            {% endif %}
+                            <div class="card-body d-flex flex-column">
+                                <h3 class="h6 card-title">{{ tarjeta.titulo }}</h3>
+                                {% if tarjeta.subtitulo %}
+                                    <p class="text-muted small">{{ tarjeta.subtitulo }}</p>
+                                {% endif %}
+                                {% if tarjeta.enlace_resuelto %}
+                                    <a class="btn btn-outline-primary mt-auto" href="{{ tarjeta.enlace_resuelto }}" target="_blank" rel="noopener">Vea mas</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="col-12 text-muted">No hay tarjetas en esta pagina.</div>
+                {% endfor %}
+            </div>
+        </div>
+    {% empty %}
+        <div class="alert alert-info">No hay tarjetas disponibles.</div>
+    {% endfor %}
+</div>
+</div>
+{% endblock %}
