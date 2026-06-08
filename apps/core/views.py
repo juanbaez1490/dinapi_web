@@ -9,11 +9,14 @@ from apps.noticias.models import Noticia
 
 from .models import Anuncio, CarouselItem, EnlaceInteres, Pagina, TemaEje
 
-# Banners institucionales: (slug_fragment, imagen_static, alt)
+# Banners institucionales: (legacy_id_pagina, imagen_static, alt)
+# Apuntamos por legacy_id explicito porque el matching por slug-fragment es
+# ambiguo (varias paginas pueden contener "transparencia", "rendicion", etc.
+# en su slug).
 _BANNERS_INSTITUCIONALES_CONFIG = [
-    ('transparencia',  'img/home/banner-transparencia.png',      'Banner transparencia'),
-    ('rendicion',      'img/home/portada-rindiendo-cuentas.jpg', 'Rendicion de cuentas'),
-    ('mecip',          'img/home/portada-mecip.jpg',             'Mecip'),
+    (1001, 'img/home/banner-transparencia.png',      'Banner transparencia'),
+    (418,  'img/home/portada-rindiendo-cuentas.jpg', 'Rendicion de cuentas'),
+    (675,  'img/home/portada-mecip.jpg',             'Mecip'),
 ]
 
 # Ejes: numero -> (titulo_grupo, color)
@@ -52,6 +55,37 @@ def home_view(request):
     return render(request, 'core/home.html', contexto)
 
 
+def _build_breadcrumbs(pagina):
+    """Construye la jerarquia de breadcrumbs caminando parent_legacy_id hacia arriba.
+
+    Devuelve una lista de dicts {titulo, url, current} ordenada raiz -> actual.
+    Limite de profundidad 6 para evitar ciclos.
+    """
+    cadena = []
+    actual = pagina
+    seen = set()
+    for _ in range(6):
+        if not actual or actual.id in seen:
+            break
+        seen.add(actual.id)
+        cadena.append(actual)
+        if not actual.parent_legacy_id:
+            break
+        actual = Pagina.objects.filter(
+            legacy_id=actual.parent_legacy_id, activo=True,
+        ).first()
+
+    cadena.reverse()
+    crumbs = [{'titulo': 'Inicio', 'url': reverse('core:home'), 'current': False}]
+    for idx, p in enumerate(cadena):
+        crumbs.append({
+            'titulo': p.titulo,
+            'url': _resolve_pagina_url(p),
+            'current': idx == len(cadena) - 1,
+        })
+    return crumbs
+
+
 def pagina_detalle_view(request, slug):
     pagina = get_object_or_404(Pagina, slug=slug, activo=True)
 
@@ -74,6 +108,7 @@ def pagina_detalle_view(request, slug):
     contexto = {
         'pagina': pagina,
         'paginas_menu': Pagina.objects.filter(activo=True, mostrar_en_menu=True).order_by('orden_menu', 'titulo'),
+        'breadcrumbs': _build_breadcrumbs(pagina),
     }
 
     if pagina.tipo == Pagina.TipoPagina.INSTITUCIONAL:
@@ -99,10 +134,11 @@ def pagina_detalle_view(request, slug):
             )
     elif pagina.tipo in (Pagina.TipoPagina.ARCHIVO_DESPLEGABLE, Pagina.TipoPagina.ARCHIVOS):
         # ArchivoDesplegablePage / ArchivoPage:
-        # - Pueden tener subpaginas (otras ArchivoPage/ArchivoDesplegablePage) que se
-        #   renderizan como secciones de acordeon.
+        # - Pueden tener subpaginas (otras ArchivoPage/ArchivoDesplegablePage)
+        #   que se renderizan como secciones de acordeon.
+        # - Esas subpaginas pueden a su vez tener nietos (caso transparencia,
+        #   donde "Leyes N° 7089" contiene sub-secciones por ano).
         # - Pueden tener Archivos pegados directamente.
-        # Si tiene subpaginas, usamos el template con acordeon; si no, el simple.
         from apps.archivos.models import Archivo
         subpaginas = list(
             Pagina.objects.filter(
@@ -116,16 +152,37 @@ def pagina_detalle_view(request, slug):
             .order_by('-fecha_ordenamiento', '-legacy_id')
         )
         if subpaginas:
-            archivos_por_subpagina = {
-                sub.id: list(
+            archivos_por_subpagina = {}
+            subsubpaginas_por_subpagina = {}
+            for sub in subpaginas:
+                archivos_por_subpagina[sub.id] = list(
                     Archivo.objects.filter(pagina_legacy_id=sub.legacy_id)
                     .order_by('-fecha_ordenamiento', '-legacy_id')
                 )
-                for sub in subpaginas
-            }
+                # Nietos (sub-sub-paginas) con sus archivos
+                nietos = list(
+                    Pagina.objects.filter(
+                        activo=True,
+                        parent_legacy_id=sub.legacy_id,
+                        tipo__in=[Pagina.TipoPagina.ARCHIVOS, Pagina.TipoPagina.ARCHIVO_DESPLEGABLE],
+                    ).order_by('orden_menu', 'legacy_id')
+                )
+                nietos_con_archivos = []
+                for nieto in nietos:
+                    archivos_nieto = list(
+                        Archivo.objects.filter(pagina_legacy_id=nieto.legacy_id)
+                        .order_by('-fecha_ordenamiento', '-legacy_id')
+                    )
+                    if archivos_nieto:
+                        nietos_con_archivos.append({
+                            'pagina': nieto,
+                            'archivos': archivos_nieto,
+                        })
+                subsubpaginas_por_subpagina[sub.id] = nietos_con_archivos
             plantilla = 'core/pagina_archivo_desplegable.html'
             contexto['subpaginas'] = subpaginas
             contexto['archivos_por_subpagina'] = archivos_por_subpagina
+            contexto['subsubpaginas_por_subpagina'] = subsubpaginas_por_subpagina
             contexto['archivos_directos'] = archivos_directos
         else:
             plantilla = 'core/pagina_archivos.html'
@@ -257,13 +314,13 @@ def _build_ejes_home():
 
 
 def _build_banners_institucionales():
-    """Busca paginas por slug fragment. URL queda '#' si aun no estan importadas."""
+    """Resuelve cada banner por legacy_id explicito. URL queda '#' si la
+    pagina no existe o esta inactiva."""
     banners = []
-    for slug_fragment, imagen, alt in _BANNERS_INSTITUCIONALES_CONFIG:
+    for legacy_id, imagen, alt in _BANNERS_INSTITUCIONALES_CONFIG:
         pagina = (
             Pagina.objects
-            .filter(activo=True, slug__icontains=slug_fragment)
-            .order_by('orden_menu', 'id')
+            .filter(activo=True, legacy_id=legacy_id)
             .first()
         )
         url = _resolve_pagina_url(pagina) if pagina else '#'

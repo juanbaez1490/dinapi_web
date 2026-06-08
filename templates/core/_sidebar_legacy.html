@@ -1,11 +1,22 @@
 {% comment %}
-Sidebar lateral usado en paginas de detalle (acordeon, archivo, etc).
-Contiene: portada del ultimo InfoDINAPI + 3 noticias destacadas.
-Las variables vienen del context processor core.context_processors.
+Sidebar lateral reutilizable.
+
+Contiene por default:
+  - portada del ultimo InfoDINAPI
+  - 3 noticias destacadas
+
+Se puede ocultar cada bloque pasando flags al include:
+  {% include 'core/_sidebar_legacy.html' with show_noticias_destacadas=False %}
+  {% include 'core/_sidebar_legacy.html' with show_infodinapi=False %}
+
+Las variables provienen del context processor core.context_processors.
 {% endcomment %}
+{% load static %}
+{# Defaults: True a menos que se override por include con=False #}
+{% if show_infodinapi is None %}{% with show_infodinapi=True %}{% endwith %}{% endif %}
 <aside class="sidebar-legacy">
 
-	{% if sidebar_infodinapi %}
+	{% if sidebar_infodinapi and show_infodinapi != False %}
 	<div class="sidebar-card sidebar-infodinapi">
 		<a href="{% url 'biblioteca:detalle' sidebar_infodinapi.slug %}" class="sidebar-infodinapi-link"
 		   title="Ver {{ sidebar_infodinapi.titulo }}">
@@ -26,7 +37,7 @@ Las variables vienen del context processor core.context_processors.
 	</div>
 	{% endif %}
 
-	{% if sidebar_noticias_destacadas %}
+	{% if sidebar_noticias_destacadas and show_noticias_destacadas != False %}
 	<div class="sidebar-card sidebar-noticias">
 		<h3 class="sidebar-card-title">Noticias destacadas</h3>
 		<ul class="sidebar-noticias-list">
