@@ -8,10 +8,11 @@
 	<nav aria-label="breadcrumb" class="mb-3">
 		<ol class="breadcrumb">
 			<li class="breadcrumb-item"><a href="{% url 'core:home' %}">Inicio</a></li>
+			<li class="breadcrumb-item"><a href="{% url 'boletines:index' %}">Boletines</a></li>
 			{% if periodo.tipo == 'marca' %}
-			<li class="breadcrumb-item"><a href="{% url 'boletines:marcas' %}">Boletines Marca</a></li>
+			<li class="breadcrumb-item"><a href="{% url 'boletines:marcas' %}">Marcas</a></li>
 			{% else %}
-			<li class="breadcrumb-item"><a href="{% url 'boletines:general' %}">Boletines</a></li>
+			<li class="breadcrumb-item"><a href="{% url 'boletines:patentes' %}">Patentes</a></li>
 			{% endif %}
 			<li class="breadcrumb-item active" aria-current="page">{{ periodo.titulo }}</li>
 		</ol>
@@ -58,11 +59,11 @@
 	<div class="mt-4 pt-3 border-top">
 		{% if periodo.tipo == 'marca' %}
 		<a href="{% url 'boletines:marcas' %}" class="btn btn-outline-secondary btn-sm">
-			&larr; Volver a boletines marca
+			&larr; Volver a Boletines de Marcas
 		</a>
 		{% else %}
-		<a href="{% url 'boletines:general' %}" class="btn btn-outline-secondary btn-sm">
-			&larr; Volver a boletines
+		<a href="{% url 'boletines:patentes' %}" class="btn btn-outline-secondary btn-sm">
+			&larr; Volver a Boletines de Patentes
 		</a>
 		{% endif %}
 	</div>

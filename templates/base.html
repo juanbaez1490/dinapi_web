@@ -27,16 +27,20 @@
             --dinapi-red-dark: #8f0f25;
             --dinapi-blue: #00529c;
             --dinapi-blue-deep: #183246;
+            --dinapi-blue-darker: #114875;
             --dinapi-gold: #ffc31b;
             --dinapi-green: #8cc63e;
-            --light-bg: #ececec;
+            --light-bg: #ffffff;
             --ink: #1d2530;
+            /* Familia tipografica unica para titulos del sitio.
+               Cae a Barlow (ya cargado), luego Open Sans (Bootstrap default). */
+            --dinapi-title-font: 'Barlow', 'Open Sans', system-ui, sans-serif;
         }
-        
+
         body {
             font-family: 'Barlow', sans-serif;
             color: var(--ink);
-            background: var(--light-bg);
+            background: #ffffff;
             font-size: 15px;
             line-height: 1.45;
         }
@@ -68,10 +72,10 @@
         }
 
         .site-masthead {
-            background: #ececec;
+            background: #ffffff;
             padding-top: 0.5rem;
             padding-bottom: 0.45rem;
-            border-bottom: 1px solid #d8d8d8;
+            border-bottom: 1px solid #e6e6e6;
         }
 
         .site-masthead .masthead-shell {
@@ -476,9 +480,6 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark navbar-custom sticky-top">
         <div class="container navbar-shell">
-            <a class="navbar-brand" href="/">
-                <i class="fas fa-shield-alt"></i> DINAPI
-            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -493,6 +494,7 @@
                     <li class="nav-item">
                         <a class="nav-link {% if item.url != '/' and item.url in request.path or request.path == item.url %}active{% endif %}"
                            href="{{ item.url }}"
+                           {% if item.target_blank %}target="_blank" rel="noopener"{% endif %}
                            {% if item.url != '/' and item.url in request.path or request.path == item.url %}aria-current="page"{% endif %}>
                             {{ item.pagina.titulo }}
                         </a>
@@ -517,7 +519,9 @@
                             </li>
                             {% for hijo in grupo.hijos %}
                             <li>
-                                <a class="dropdown-item {% if hijo.nivel > 1 %}ps-4 small{% endif %}" href="{{ hijo.url }}">
+                                <a class="dropdown-item {% if hijo.nivel > 1 %}ps-4 small{% endif %}"
+                                   href="{{ hijo.url }}"
+                                   {% if hijo.target_blank %}target="_blank" rel="noopener"{% endif %}>
                                     {% if hijo.nivel > 1 %}<span class="me-1" aria-hidden="true">▹</span>{% endif %}{{ hijo.pagina.titulo }}
                                 </a>
                             </li>

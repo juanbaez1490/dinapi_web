@@ -242,31 +242,7 @@
                 </div>
 
                 <!-- Paginación -->
-                {% if is_paginated %}
-                <nav aria-label="Paginación" class="mt-4">
-                    <ul class="pagination justify-content-center flex-wrap">
-                        {% if page_obj.has_previous %}
-                        <li class="page-item">
-                            <a class="page-link" href="?{% if request.GET.categoria %}categoria={{ request.GET.categoria }}&{% endif %}{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}page=1">«</a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="?{% if request.GET.categoria %}categoria={{ request.GET.categoria }}&{% endif %}{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}page={{ page_obj.previous_page_number }}">Anterior</a>
-                        </li>
-                        {% endif %}
-                        <li class="page-item active">
-                            <span class="page-link">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
-                        </li>
-                        {% if page_obj.has_next %}
-                        <li class="page-item">
-                            <a class="page-link" href="?{% if request.GET.categoria %}categoria={{ request.GET.categoria }}&{% endif %}{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}page={{ page_obj.next_page_number }}">Siguiente</a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="?{% if request.GET.categoria %}categoria={{ request.GET.categoria }}&{% endif %}{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}page={{ page_obj.paginator.num_pages }}">»</a>
-                        </li>
-                        {% endif %}
-                    </ul>
-                </nav>
-                {% endif %}
+                {% include 'core/_pagination.html' %}
 
                 {% else %}
                 <div class="alert alert-info mt-3">

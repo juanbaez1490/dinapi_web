@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ pagina.titulo }} - DINAPI{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+	<article class="tarjeta-simple-page">
+		<h1 class="mb-4">{{ pagina.titulo }}</h1>
+
+		{% if pagina.contenido %}
+		<div class="mb-4">{{ pagina.contenido|safe }}</div>
+		{% endif %}
+
+		{% if tarjetas_simples %}
+		<div class="row g-3">
+			{% for tarjeta in tarjetas_simples %}
+			<div class="col-md-6 col-lg-4">
+				<div class="card h-100 shadow-sm">
+					<div class="card-body d-flex flex-column">
+						<h3 class="h6 card-title fw-bold flex-grow-1">{{ tarjeta.titulo }}</h3>
+						{% if tarjeta.url %}
+						<a href="{{ tarjeta.url }}"
+						   class="btn btn-sm btn-primary mt-3 align-self-start"
+						   {% if tarjeta.es_externo %}target="_blank" rel="noopener"{% endif %}>
+							Vea más
+						</a>
+						{% endif %}
+					</div>
+				</div>
+			</div>
+			{% endfor %}
+		</div>
+		{% else %}
+		<div class="alert alert-info">Esta sección no tiene tarjetas configuradas.</div>
+		{% endif %}
+	</article>
+</div>
+{% endblock %}

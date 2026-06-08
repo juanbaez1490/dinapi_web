@@ -1,0 +1,23 @@
+{# Partial: render de un Archivo individual con icono PDF/link, titulo y fecha #}
+<li class="list-group-item d-flex align-items-start gap-2">
+	{% if archivo.pdf %}
+		<i class="fas fa-file-pdf text-danger mt-1 flex-shrink-0"></i>
+	{% elif archivo.link_externo %}
+		<i class="fas fa-external-link-alt text-primary mt-1 flex-shrink-0"></i>
+	{% else %}
+		<i class="fas fa-file text-muted mt-1 flex-shrink-0"></i>
+	{% endif %}
+	<div class="flex-grow-1">
+		{% if archivo.enlace_resuelto %}
+			<a href="{{ archivo.enlace_resuelto }}" target="_blank" rel="noopener"
+			   class="text-decoration-none">
+				{{ archivo.titulo }}
+			</a>
+		{% else %}
+			<span>{{ archivo.titulo }}</span>
+		{% endif %}
+		{% if archivo.fecha_ordenamiento %}
+			<br><small class="text-muted">{{ archivo.fecha_ordenamiento|date:'d/m/Y' }}</small>
+		{% endif %}
+	</div>
+</li>

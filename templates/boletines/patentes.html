@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}Boletines de Patentes - DINAPI{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+	<nav aria-label="breadcrumb" class="mb-3">
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item"><a href="{% url 'core:home' %}">Inicio</a></li>
+			<li class="breadcrumb-item"><a href="{% url 'boletines:index' %}">Boletines</a></li>
+			<li class="breadcrumb-item active" aria-current="page">Patentes</li>
+		</ol>
+	</nav>
+
+	<h1 class="mb-1">Boletines de Patentes</h1>
+	<p class="text-muted mb-4">Boletines de Patentes de Invenciones, Modelos de Utilidad y Diseños Industriales.</p>
+
+	<div class="card shadow-sm">
+		<div class="card-body">
+			<h2 class="h5 mb-4">Períodos disponibles</h2>
+
+			{% if periodos %}
+				{% for periodo in periodos %}
+					<div class="mb-4">
+						<h3 class="h6 border-bottom pb-2">{{ periodo.titulo }}</h3>
+						<div class="row">
+							{% for boletin in periodo.boletines.all %}
+								<div class="col-12 col-md-6 mb-2">
+									<div class="d-flex align-items-start gap-2">
+										<i class="fas fa-file-pdf text-danger mt-1"></i>
+										<div>
+											{% if boletin.pdf %}
+												<a href="{{ boletin.pdf.url }}" target="_blank" rel="noopener" class="text-decoration-none">
+													{{ boletin.titulo }}
+												</a>
+											{% else %}
+												<span>{{ boletin.titulo }}</span>
+											{% endif %}
+											{% if boletin.imagen %}
+												&nbsp;
+												<a href="{{ boletin.imagen.url }}" target="_blank" rel="noopener" class="text-muted small">
+													(imagen)
+												</a>
+											{% endif %}
+											{% if boletin.fecha %}
+												<br><small class="text-muted">{{ boletin.fecha|date:'d/m/Y' }}</small>
+											{% endif %}
+										</div>
+									</div>
+								</div>
+							{% empty %}
+								<div class="col-12 text-muted">Sin entradas en este período.</div>
+							{% endfor %}
+						</div>
+					</div>
+				{% endfor %}
+			{% else %}
+				<div class="alert alert-info mb-0">No hay boletines disponibles.</div>
+			{% endif %}
+		</div>
+	</div>
+
+	<div class="mt-3 d-flex gap-2">
+		<a href="{% url 'boletines:index' %}" class="btn btn-outline-secondary btn-sm">&larr; Volver</a>
+		<a href="{% url 'boletines:marcas' %}" class="btn btn-outline-primary btn-sm">Ver Boletines de Marcas</a>
+	</div>
+</div>
+{% endblock %}

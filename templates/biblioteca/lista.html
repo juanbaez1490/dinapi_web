@@ -47,15 +47,27 @@
         border: 0; border-radius: 5px; overflow: hidden;
         box-shadow: 0 2px 8px rgba(0,0,0,.09);
         transition: transform .22s, box-shadow .22s; height: 100%;
+        display: flex; flex-direction: column;
+        background: #fff;
     }
     .bib-card:hover { transform: translateY(-3px); box-shadow: 0 6px 18px rgba(0,0,0,.13); }
-    .bib-card .card-img-top { height: 155px; object-fit: cover; width: 100%; }
-    .bib-card .card-img-placeholder {
-        height: 155px; background: #e4e9ef;
-        display: flex; align-items: center; justify-content: center;
-        color: #aab; font-size: 2rem;
+    /* Imagen con proporcion vertical tipo portada de revista (A4 ~ 0.71) */
+    .bib-card .card-img-top {
+        width: 100%;
+        aspect-ratio: 3 / 4;
+        object-fit: cover;
+        object-position: top center;
+        background: #f0f3f7;
     }
-    .bib-card .card-body { padding: 0.8rem; }
+    .bib-card .card-img-placeholder {
+        width: 100%;
+        aspect-ratio: 3 / 4;
+        background: linear-gradient(135deg, #e4e9ef 0%, #d3dbe6 100%);
+        display: flex; align-items: center; justify-content: center;
+        color: #8a99af; font-size: 3rem;
+    }
+    .bib-card .card-body { padding: 0.85rem; display: flex; flex-direction: column; flex-grow: 1; }
+    .bib-card .btn-ver { margin-top: auto; align-self: flex-start; }
     .bib-card .badge-cat {
         font-size: 0.67rem; background: var(--dinapi-blue); color: #fff;
         padding: 0.18em 0.5em; border-radius: 3px;
@@ -130,19 +142,7 @@
                     {% endfor %}
                 </div>
 
-                {% if is_paginated %}
-                <nav aria-label="Paginacion" class="mt-4">
-                    <ul class="pagination justify-content-center">
-                        {% if page_obj.has_previous %}
-                        <li class="page-item"><a class="page-link" href="?{% if request.GET.categoria %}categoria={{ request.GET.categoria }}&{% endif %}{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}page={{ page_obj.previous_page_number }}">Anterior</a></li>
-                        {% endif %}
-                        <li class="page-item active"><span class="page-link">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span></li>
-                        {% if page_obj.has_next %}
-                        <li class="page-item"><a class="page-link" href="?{% if request.GET.categoria %}categoria={{ request.GET.categoria }}&{% endif %}{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}page={{ page_obj.next_page_number }}">Siguiente</a></li>
-                        {% endif %}
-                    </ul>
-                </nav>
-                {% endif %}
+                {% include 'core/_pagination.html' %}
 
                 {% else %}
                 <div class="alert alert-info mt-3">No se encontraron elementos en la biblioteca.</div>

@@ -5,11 +5,33 @@ from django.views.generic import DetailView, TemplateView
 from .models import PeriodoBoletin, Boletin
 
 
-class BoletinGeneralListView(TemplateView):
-    """Vista equivalente a BoletinPage de SilverStripe.
-    Agrupa BoletinGeneral (tipo=general) por periodo, ordenados de más nuevo a más viejo.
+class BoletinIndexView(TemplateView):
+    """Landing de /boletines/ con dos cards: Patentes y Marcas.
+    Aclara la naveg cuando llegan a la URL raiz sin contexto.
     """
-    template_name = 'boletines/general.html'
+    template_name = 'boletines/index.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['count_patentes'] = (
+            PeriodoBoletin.objects
+            .filter(tipo=PeriodoBoletin.Tipo.GENERAL)
+            .count()
+        )
+        context['count_marcas'] = (
+            PeriodoBoletin.objects
+            .filter(tipo=PeriodoBoletin.Tipo.MARCA)
+            .count()
+        )
+        return context
+
+
+class BoletinPatentesListView(TemplateView):
+    """Vista de los Boletines de Patentes / Diseño Industrial.
+    Equivalente a BoletinPage de SilverStripe. En el modelo el tipo se
+    llama 'general' por razones historicas pero contiene patentes + DI.
+    """
+    template_name = 'boletines/patentes.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -21,6 +43,10 @@ class BoletinGeneralListView(TemplateView):
         )
         context['periodos'] = periodos
         return context
+
+
+# Alias para compat con codigo que aun importe BoletinGeneralListView
+BoletinGeneralListView = BoletinPatentesListView
 
 
 class BoletinMarcaListView(TemplateView):

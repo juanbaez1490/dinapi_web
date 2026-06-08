@@ -3,74 +3,127 @@
 
 {% block title %}{{ pagina.titulo }} - DINAPI{% endblock %}
 
+{% block extra_css %}
+<style>
+	/* --- Hero con imagen de cabecera al estilo legacy --- */
+	.tarjetas-hero {
+		position: relative;
+		min-height: 320px;
+		background-size: cover;
+		background-position: center;
+		margin-bottom: 2.5rem;
+	}
+	.tarjetas-hero .tarjetas-hero-title {
+		position: absolute;
+		top: 1rem;
+		left: 1rem;
+		color: #fff;
+		background: rgba(0, 0, 0, 0.55);
+		padding: 0.6rem 1.5rem;
+		font-size: 2.2rem;
+		font-weight: 400;
+		margin: 0;
+		min-width: 280px;
+	}
+	@media (max-width: 768px) {
+		.tarjetas-hero { min-height: 180px; }
+		.tarjetas-hero .tarjetas-hero-title { font-size: 1.4rem; padding: 0.4rem 1rem; }
+	}
+
+	/* --- Grid de tarjetas coloradas --- */
+	.tarjetas-grid { margin-bottom: 2.5rem; }
+	.tarjeta-marca {
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		text-align: center;
+		text-decoration: none;
+		color: #fff !important;
+		padding: 2.2rem 1.2rem 1.4rem;
+		border-radius: 4px;
+		position: relative;
+		overflow: hidden;
+		height: 100%;
+		min-height: 220px;
+		transition: transform .18s ease, box-shadow .18s ease;
+	}
+	.tarjeta-marca:hover {
+		transform: translateY(-3px);
+		box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+		color: #fff !important;
+	}
+	/* "esquina" mas clara arriba a la derecha (estilo legacy) */
+	.tarjeta-marca::after {
+		content: '';
+		position: absolute;
+		top: 0; right: 0;
+		width: 80px; height: 80px;
+		background: rgba(255, 255, 255, 0.18);
+		clip-path: polygon(100% 0, 100% 100%, 0 0);
+	}
+	.tarjeta-marca-icon-wrap {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-grow: 1;
+		margin-bottom: 1rem;
+	}
+	.tarjeta-marca-icon {
+		max-width: 90px;
+		max-height: 90px;
+		width: auto; height: auto;
+		filter: brightness(0) invert(1);   /* forza icono blanco */
+	}
+	.tarjeta-marca-title {
+		font-size: 1rem;
+		font-weight: 400;
+		color: #fff;
+		margin: 0;
+		line-height: 1.3;
+	}
+
+	/* Paleta legacy rotativa: rojo / azul / amarillo */
+	.tarjeta-marca.color-rojo     { background: #dc3340; }
+	.tarjeta-marca.color-azul     { background: #1f5fa8; }
+	.tarjeta-marca.color-amarillo { background: #efb01f; }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container my-4">
-	<div class="row g-4">
-		<div class="col-lg-9">
-			<article class="tarjetas-page">
+{% if tarjeta_page.imagen %}
+<header class="tarjetas-hero" style="background-image: url('{{ tarjeta_page.imagen.url }}');">
+	<h1 class="tarjetas-hero-title">{{ pagina.titulo }}</h1>
+</header>
+{% else %}
+<div class="container mt-4 mb-3">
+	<h1>{{ pagina.titulo }}</h1>
+</div>
+{% endif %}
 
-				<h1 class="mb-4">{{ pagina.titulo }}</h1>
+<div class="container">
+	{% if pagina.contenido %}
+	<div class="mb-4">{{ pagina.contenido|safe }}</div>
+	{% endif %}
 
-				{% if tarjeta_page.imagen %}
-				<img src="{{ tarjeta_page.imagen.url }}" class="img-fluid rounded mb-4" alt="{{ pagina.titulo }}">
-				{% endif %}
-
-				{# Contenido HTML del SiteTree (intro, si existe) #}
-				{% if pagina.contenido %}
-				<div class="tarjetas-intro mb-4">
-					{{ pagina.contenido|safe }}
+	{% if tarjetas %}
+	<div class="row g-4 tarjetas-grid">
+		{% for tarjeta in tarjetas %}
+		<div class="col-md-6 col-lg-4">
+			<a href="{{ tarjeta.enlace_resuelto|default:'#' }}"
+			   class="tarjeta-marca {% if forloop.counter0|divisibleby:3 %}color-rojo{% elif forloop.counter|divisibleby:3 %}color-amarillo{% else %}color-azul{% endif %}"
+			   {% if tarjeta.link_externo %}target="_blank" rel="noopener"{% endif %}>
+				<div class="tarjeta-marca-icon-wrap">
+					{% if tarjeta.imagen %}
+					<img src="{{ tarjeta.imagen.url }}" class="tarjeta-marca-icon" alt="">
+					{% endif %}
 				</div>
-				{% endif %}
-
-				{# Grid de tarjetas #}
-				{% if tarjetas %}
-				<div class="row g-3">
-					{% for tarjeta in tarjetas %}
-					<div class="col-md-6 col-lg-4">
-						<div class="card h-100 shadow-sm">
-							{% if tarjeta.imagen %}
-							<img src="{{ tarjeta.imagen.url }}" class="card-img-top" alt="{{ tarjeta.titulo }}"
-							     style="object-fit: cover; max-height: 180px;">
-							{% endif %}
-							<div class="card-body d-flex flex-column">
-								<h3 class="h6 card-title fw-bold">{{ tarjeta.titulo }}</h3>
-								{% if tarjeta.subtitulo %}
-								<p class="card-text small text-muted mb-3">{{ tarjeta.subtitulo }}</p>
-								{% endif %}
-								{% if tarjeta.enlace_resuelto %}
-								<a href="{{ tarjeta.enlace_resuelto }}"
-								   class="btn btn-sm btn-primary mt-auto align-self-start"
-								   {% if tarjeta.link_externo %}target="_blank" rel="noopener"{% endif %}>
-									Vea más
-								</a>
-								{% endif %}
-							</div>
-						</div>
-					</div>
-					{% endfor %}
-				</div>
-				{% else %}
-				<div class="alert alert-info">No hay tarjetas disponibles en esta sección.</div>
-				{% endif %}
-
-			</article>
+				<div class="tarjeta-marca-title">{{ tarjeta.titulo }}</div>
+			</a>
 		</div>
-
-		<aside class="col-lg-3">
-			<div class="card p-3">
-				<h6 class="text-uppercase small fw-bold text-muted mb-2">Otras páginas</h6>
-				<div class="list-group list-group-flush">
-					{% for p in paginas_menu %}
-					<a href="{% url 'core:pagina_detalle' p.slug %}"
-					   class="list-group-item list-group-item-action px-2 {% if p.id == pagina.id %}active{% endif %}">
-						{{ p.titulo }}
-					</a>
-					{% empty %}
-					<span class="text-muted small">Sin páginas de menú.</span>
-					{% endfor %}
-				</div>
-			</div>
-		</aside>
+		{% endfor %}
 	</div>
+	{% else %}
+	<div class="alert alert-info">No hay tarjetas disponibles en esta sección.</div>
+	{% endif %}
 </div>
 {% endblock %}
