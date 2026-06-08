@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'apps.boletines',
     'apps.menus',
     'apps.calendario',
+    'apps.archivos',
 ]
 
 MIDDLEWARE = [
@@ -61,6 +62,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'apps.menus.context_processors.menu_popup_context',
+                'apps.core.context_processors.sidebar_legacy_context',
             ],
         },
     },

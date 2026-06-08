@@ -79,14 +79,38 @@ class Command(BaseCommand):
         dry_run: bool,
     ) -> int:
         copied = 0
+        media_root = Path(settings.MEDIA_ROOT)
 
-        # Capa 1: copia completa para preservar enlaces historicos.
+        # Capa 1: copia completa para preservar enlaces historicos (HTML embebido).
         copied += self._copy_tree(source_assets, legacy_assets_target, dry_run=dry_run)
 
         # Capa 2: compatibilidad con ImageField de Noticia (media/noticias/imagenes-noticias).
         legacy_news_images = source_assets / "noticias" / "imagenes-noticias"
         if legacy_news_images.exists() and legacy_news_images.is_dir():
             copied += self._copy_tree(legacy_news_images, noticia_images_target, dry_run=dry_run)
+
+        # Capa 3: subcarpetas que los ImageField del modelo referencian
+        # con su misma estructura (sin prefijo legacy/assets/).
+        # Cada subdir legacy se espeja 1-a-1 bajo MEDIA_ROOT.
+        imagefield_subdirs = [
+            "imagenes-tarjeta",
+            "Uploads",
+            "imagenes-pop-up",
+            "iconos-quick-access",
+            "imagenes-acordeon",
+            "iconos-eje",
+            "configuracion",
+            "paginas",
+            "concursos",
+            "tarjetas",
+            "acordeon",
+        ]
+        for sub in imagefield_subdirs:
+            src = source_assets / sub
+            if not src.exists() or not src.is_dir():
+                continue
+            dst = media_root / sub
+            copied += self._copy_tree(src, dst, dry_run=dry_run)
 
         return copied
 

@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ pagina.titulo }} - DINAPI{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+	<div class="row g-4">
+		<div class="col-lg-3 order-lg-1">
+			{% include 'core/_sidebar_legacy.html' %}
+		</div>
+		<div class="col-lg-9 order-lg-2">
+	<article class="archivo-page">
+		<h1 class="mb-1">{{ pagina.titulo }}</h1>
+		{% if pagina.subtitulo %}
+		<p class="text-muted">{{ pagina.subtitulo }}</p>
+		{% endif %}
+
+		{% if pagina.imagen_principal %}
+		<img src="{{ pagina.imagen_principal.url }}" class="img-fluid rounded mb-3" alt="{{ pagina.titulo }}">
+		{% endif %}
+
+		{% if pagina.contenido %}
+		<div class="mb-4">{{ pagina.contenido|safe }}</div>
+		{% endif %}
+
+		{% if archivos %}
+		<ul class="list-group">
+			{% for archivo in archivos %}
+				{% include 'core/_archivo_item.html' with archivo=archivo %}
+			{% endfor %}
+		</ul>
+		{% else %}
+		<div class="alert alert-info">No hay archivos disponibles en esta sección.</div>
+		{% endif %}
+	</article>
+		</div>
+	</div>
+</div>
+{% endblock %}

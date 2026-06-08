@@ -47,6 +47,36 @@ class Tarjeta(models.Model):
 		return self.link_interno_url
 
 
+class TarjetaSimple(models.Model):
+	"""
+	Tarjeta simple del legacy SilverStripe (tabla `TarjetaSimple`).
+
+	Mas chica que `Tarjeta`: solo titulo + un link (interno por legacy_id de
+	la pagina destino, o externo). No tiene imagen ni subtitulo. Se asocia a
+	una Pagina tipo TarjetaSimplePage via `pagina_legacy_id`.
+	"""
+	legacy_id = models.PositiveIntegerField(unique=True)
+	pagina_legacy_id = models.PositiveIntegerField(
+		null=True, blank=True, db_index=True,
+		help_text='ID legacy de la Pagina contenedora (TarjetaSimplePage).',
+	)
+	titulo = models.TextField()
+	link_interno_legacy_id = models.PositiveIntegerField(
+		null=True, blank=True,
+		help_text='ID legacy de la Pagina destino para link interno.',
+	)
+	link_externo = models.CharField(max_length=500, blank=True, default='')
+	legacy_created = models.DateTimeField(null=True, blank=True)
+
+	class Meta:
+		verbose_name = 'Tarjeta simple'
+		verbose_name_plural = 'Tarjetas simples'
+		ordering = ['legacy_id']
+
+	def __str__(self):
+		return self.titulo[:80]
+
+
 class AcordeonPage(models.Model):
 	legacy_id = models.PositiveIntegerField(unique=True)
 	titulo_padre = models.CharField(max_length=350, blank=True)

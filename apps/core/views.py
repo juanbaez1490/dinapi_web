@@ -1,7 +1,7 @@
 import re
 import unicodedata
 
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import NoReverseMatch, reverse
 from django.utils import timezone
 
@@ -54,6 +54,21 @@ def home_view(request):
 
 def pagina_detalle_view(request, slug):
     pagina = get_object_or_404(Pagina, slug=slug, activo=True)
+
+    # Algunos tipos de Pagina son contenedores que no se renderizan con
+    # template propio: redirigen al listado canonico de la app correspondiente.
+    if pagina.tipo in (
+        Pagina.TipoPagina.BOLETIN,
+        Pagina.TipoPagina.PERIODO_BOLETIN,
+    ):
+        return redirect('boletines:patentes')
+    if pagina.tipo in (
+        Pagina.TipoPagina.BOLETIN_MARCA,
+        Pagina.TipoPagina.PERIODO_BOLETIN_MARCA,
+        Pagina.TipoPagina.PERIODO_BOLETIN_MARCA_GENERICO,
+    ):
+        return redirect('boletines:marcas')
+
     plantilla = pagina.plantilla_personalizada or 'core/pagina_detalle.html'
 
     contexto = {
@@ -82,6 +97,64 @@ def pagina_detalle_view(request, slug):
             contexto['acordeon_items'] = acordeon.desplegables.all().order_by(
                 '-fecha_ordenamiento', '-legacy_id'
             )
+    elif pagina.tipo in (Pagina.TipoPagina.ARCHIVO_DESPLEGABLE, Pagina.TipoPagina.ARCHIVOS):
+        # ArchivoDesplegablePage / ArchivoPage:
+        # - Pueden tener subpaginas (otras ArchivoPage/ArchivoDesplegablePage) que se
+        #   renderizan como secciones de acordeon.
+        # - Pueden tener Archivos pegados directamente.
+        # Si tiene subpaginas, usamos el template con acordeon; si no, el simple.
+        from apps.archivos.models import Archivo
+        subpaginas = list(
+            Pagina.objects.filter(
+                activo=True,
+                parent_legacy_id=pagina.legacy_id,
+                tipo__in=[Pagina.TipoPagina.ARCHIVOS, Pagina.TipoPagina.ARCHIVO_DESPLEGABLE],
+            ).order_by('orden_menu', 'legacy_id')
+        )
+        archivos_directos = list(
+            Archivo.objects.filter(pagina_legacy_id=pagina.legacy_id)
+            .order_by('-fecha_ordenamiento', '-legacy_id')
+        )
+        if subpaginas:
+            archivos_por_subpagina = {
+                sub.id: list(
+                    Archivo.objects.filter(pagina_legacy_id=sub.legacy_id)
+                    .order_by('-fecha_ordenamiento', '-legacy_id')
+                )
+                for sub in subpaginas
+            }
+            plantilla = 'core/pagina_archivo_desplegable.html'
+            contexto['subpaginas'] = subpaginas
+            contexto['archivos_por_subpagina'] = archivos_por_subpagina
+            contexto['archivos_directos'] = archivos_directos
+        else:
+            plantilla = 'core/pagina_archivos.html'
+            contexto['archivos'] = archivos_directos
+    elif pagina.tipo == Pagina.TipoPagina.TARJETAS_SIMPLES:
+        # TarjetaSimplePage = lista de tarjetas con titulo + link (interno
+        # por legacy_id o externo). Resolvemos los links internos a slug.
+        from apps.tarjetas.models import TarjetaSimple
+        tarjetas_qs = TarjetaSimple.objects.filter(pagina_legacy_id=pagina.legacy_id).order_by('legacy_id')
+        # Resolver link_interno_legacy_id -> URL
+        legacy_ids = [t.link_interno_legacy_id for t in tarjetas_qs if t.link_interno_legacy_id]
+        paginas_destino = {
+            p.legacy_id: p
+            for p in Pagina.objects.filter(legacy_id__in=legacy_ids, activo=True)
+        }
+        tarjetas_render = []
+        for t in tarjetas_qs:
+            url = ''
+            if t.link_interno_legacy_id and t.link_interno_legacy_id in paginas_destino:
+                url = _resolve_pagina_url(paginas_destino[t.link_interno_legacy_id])
+            elif t.link_externo:
+                url = t.link_externo
+            tarjetas_render.append({
+                'titulo': t.titulo,
+                'url': url,
+                'es_externo': bool(t.link_externo and not t.link_interno_legacy_id),
+            })
+        plantilla = 'core/pagina_tarjeta_simple.html'
+        contexto['tarjetas_simples'] = tarjetas_render
     elif pagina.tipo == Pagina.TipoPagina.TARJETAS:
         # Para TarjetaPage pulleamos la TarjetaPage relacionada con sus
         # tarjetas hijas. El template renderiza un grid de cards.
@@ -215,55 +288,56 @@ def _build_banners_servicios():
 
 
 def _build_institucional_cards(pagina):
-    hijos = list(
-        Pagina.objects.filter(activo=True, parent_legacy_id=pagina.legacy_id)
-        .order_by('orden_menu', 'legacy_id', 'id')
-    )
-    if not hijos:
-        return []
+    """
+    Construye las 12 tarjetas del landing institucional con mapping explicito
+    de legacy_id a label, replicando lo que muestra el legacy.
 
-    hijos_normalizados = [(item, _normalize_text(item.titulo)) for item in hijos]
-    card_specs = [
-        {'tokens': ['acceso', 'informacion', 'publica']},
-        {'tokens': ['autoridades']},
-        {'tokens': ['concursos']},
-        {'tokens': ['convenios'], 'prefer_without': ['dinapi']},
-        {'tokens': ['gestion', 'personas']},
-        {'tokens': ['marco', 'normativo']},
-        {'tokens': ['mecip']},
-        {'tokens': ['mision', 'vision', 'valores', 'institucionales']},
-        {'tokens': ['organigrama']},
-        {'tokens': ['plan', 'nacional', 'propiedad', 'intelectual']},
-        {'tokens': ['programas', 'proyectos']},
+    Cada entry es (legacy_id, label_default, url_alternativa).
+    Si la Pagina existe en BD, usa su titulo y su URL resuelta.
+    Si no existe, usa label_default + url_alternativa (util para entries que
+    apuntan a PDFs externos como el Plan Estrategico).
+    """
+    cards_spec = [
+        (330,  'Acceso a la Información Pública',               None),
+        (329,  'Autoridades',                                   None),
+        (331,  'Concursos',                                     None),
+        (968,  'Convenios',                                     None),
+        (891,  'Gestión de las personas',                       None),
+        (341,  'Marco Normativo de la Propiedad Intelectual',   None),
+        (675,  'MECIP',                                         None),
+        (327,  'Misión, Visión y Valores Institucionales',      None),
+        (328,  'Organigrama',                                   None),
+        # Plan Estrategico: link directo a PDF, no hay Pagina equivalente
+        (None, 'Plan Estratégico Institucional',
+               '/assets/archivos-institucionales/PEI-2024-2028-EDITADO-27022024.pdf'),
+        (988,  'Plan Nacional de Propiedad Intelectual',        None),
+        (429,  'Programas y Proyectos',                         None),
     ]
 
-    selected = []
-    used_legacy_ids = set()
+    paginas_by_legacy = {
+        p.legacy_id: p
+        for p in Pagina.objects.filter(
+            activo=True,
+            legacy_id__in=[lid for lid, _, _ in cards_spec if lid is not None],
+        )
+    }
 
-    for spec in card_specs:
-        candidates = []
-        for item, norm_title in hijos_normalizados:
-            if item.legacy_id in used_legacy_ids:
-                continue
-            if all(token in norm_title for token in spec['tokens']):
-                candidates.append((item, norm_title))
-        if not candidates:
+    cards = []
+    for idx, (legacy_id, label, url_alt) in enumerate(cards_spec):
+        if legacy_id is None:
+            cards.append({'titulo': label, 'url': url_alt, 'variant': idx % 3})
             continue
+        pagina_obj = paginas_by_legacy.get(legacy_id)
+        if pagina_obj is None:
+            # la pagina no esta en BD o esta desactivada -> saltamos
+            continue
+        cards.append({
+            'titulo': label or _format_card_title(pagina_obj.titulo),
+            'url': _resolve_pagina_url(pagina_obj),
+            'variant': idx % 3,
+        })
 
-        prefer_without = spec.get('prefer_without')
-        if prefer_without:
-            candidates.sort(key=lambda d: (any(t in d[1] for t in prefer_without), len(d[1])))
-        else:
-            candidates.sort(key=lambda d: len(d[1]))
-
-        picked = candidates[0][0]
-        selected.append(picked)
-        used_legacy_ids.add(picked.legacy_id)
-
-    return [
-        {'titulo': _format_card_title(item.titulo), 'url': _resolve_pagina_url(item), 'variant': idx % 3}
-        for idx, item in enumerate(selected)
-    ]
+    return cards
 
 
 def _format_card_title(title):
@@ -296,7 +370,7 @@ def _resolve_pagina_url(pagina):
         if tipo in {Pagina.TipoPagina.CONCURSOS, Pagina.TipoPagina.CONCURSO_JUVENTUD}:
             return reverse('concursos:lista')
         if tipo in {Pagina.TipoPagina.BOLETIN, Pagina.TipoPagina.PERIODO_BOLETIN}:
-            return reverse('boletines:general')
+            return reverse('boletines:patentes')
         if tipo in {
             Pagina.TipoPagina.BOLETIN_MARCA,
             Pagina.TipoPagina.PERIODO_BOLETIN_MARCA,
@@ -304,7 +378,9 @@ def _resolve_pagina_url(pagina):
         }:
             return reverse('boletines:marcas')
         if tipo in {Pagina.TipoPagina.ARCHIVOS, Pagina.TipoPagina.ARCHIVO_DESPLEGABLE}:
-            return reverse('biblioteca:lista')
+            # Cada ArchivoPage/ArchivoDesplegablePage tiene sus propios PDFs;
+            # llevamos al detalle individual, no al listado global de biblioteca.
+            return reverse('core:pagina_detalle', kwargs={'slug': pagina.slug})
         if tipo == Pagina.TipoPagina.CALENDARIO:
             return reverse('calendario:index')
         if tipo == Pagina.TipoPagina.TARJETAS:

@@ -3,102 +3,248 @@
 
 {% block title %}{{ pagina.titulo }} - DINAPI{% endblock %}
 
+{% block extra_css %}
+<style>
+	/* === Estilo DINAPI legacy aplicado a paginas de acordeon === */
+
+	/* Container principal con ancho legacy (~1000px) */
+	.acordeon-page-legacy {
+		max-width: 1100px;
+		margin: 0 auto;
+		padding: 0 15px;
+	}
+
+	/* === JERARQUIA TIPOGRAFICA UNIFICADA ===
+	   Toda la pagina usa la misma familia y misma paleta.
+	   Solo cambia el tamano y el spacing para crear la jerarquia.
+	   - H1  -> titulo de la pagina (mas grande, con linea inferior gruesa)
+	   - H2  -> seccion (mediano, con linea inferior sutil)
+	   - H4  -> item desplegable (mas chico, azul, mayusculas)
+	*/
+
+	/* H1 - titulo principal de la pagina */
+	.acordeon-page-legacy h1.page-title {
+		color: #114875;
+		font-family: var(--dinapi-title-font, "Barlow", "Open Sans", sans-serif);
+		font-weight: 700;
+		font-size: 2rem;
+		letter-spacing: 0.01em;
+		margin: 2rem 0 1.2rem;
+		padding-bottom: 0.7rem;
+		border-bottom: 3px solid #b3132f;
+		line-height: 1.2;
+	}
+
+	/* H2 de seccion - mismo color/fuente que H1, mas chico, separador suave.
+	   Aplicamos el MISMO estilo a h2 y h2.inicial para uniformidad. */
+	.information-texto h2,
+	.information-texto h2.inicial {
+		color: #114875;
+		font-family: var(--dinapi-title-font, "Barlow", "Open Sans", sans-serif);
+		font-weight: 700;
+		font-size: 1.35rem;
+		text-transform: uppercase;
+		letter-spacing: 0.02em;
+		margin: 2.5rem 0 1.2rem;
+		padding-bottom: 0.5rem;
+		border-bottom: 1px solid #d8dde5;
+		line-height: 1.3;
+	}
+	/* h2 vacios que vienen del legacy (Silverstripe agregaba <h2 class="inicial"></h2>
+	   sin contenido como placeholder) — los ocultamos para evitar gaps. */
+	.information-texto h2:empty,
+	.information-texto h2.inicial:empty {
+		display: none;
+	}
+
+	/* H3 - subseccion ocasional */
+	.information-texto h3 {
+		color: #114875;
+		font-family: var(--dinapi-title-font, "Barlow", "Open Sans", sans-serif);
+		font-weight: 700;
+		font-size: 1.1rem;
+		margin: 1.5rem 0 0.8rem;
+	}
+
+	/* H4 con role de toggle (item desplegable) */
+	.information-texto h4,
+	.information-texto h4[data-bs-toggle="collapse"] {
+		color: #00529c;
+		font-family: var(--dinapi-title-font, "Barlow", "Open Sans", sans-serif);
+		font-weight: 600;
+		font-size: 1rem;
+		text-transform: uppercase;
+		letter-spacing: 0.02em;
+		cursor: pointer;
+		margin: 0.8rem 0 0.4rem;
+		padding: 0.55rem 0.85rem;
+		user-select: none;
+		background: #f5f7fa;
+		border-left: 3px solid #00529c;
+		border-radius: 2px;
+		transition: background 0.15s ease, color 0.15s ease;
+	}
+	.information-texto h4[data-bs-toggle="collapse"]:hover {
+		background: #ebf0f7;
+		color: #b3132f;
+	}
+	.information-texto h4[data-bs-toggle="collapse"][aria-expanded="true"] {
+		background: #00529c;
+		color: #fff;
+	}
+	.information-texto h4[data-bs-toggle="collapse"]:focus {
+		outline: none;
+	}
+
+	/* Cuerpo del acordeon (cuando se expande) */
+	.information-texto .collapse {
+		padding: 0.4rem 0.85rem 1rem;
+	}
+	.information-texto .collapse p,
+	.information-texto .collapse ul,
+	.information-texto .collapse ol,
+	.information-texto .collapse li {
+		color: #495057;
+		font-size: 0.95rem;
+		line-height: 1.6;
+		text-align: justify;
+	}
+	.information-texto .collapse p {
+		margin-bottom: 0.8rem;
+	}
+	.information-texto .collapse ul,
+	.information-texto .collapse ol {
+		padding-left: 1.4rem;
+	}
+	.information-texto .collapse li {
+		margin-bottom: 0.5rem;
+	}
+	.information-texto .collapse a {
+		color: #00529c;
+		text-decoration: underline;
+	}
+	.information-texto .collapse a:hover {
+		color: #b3132f;
+	}
+
+	/* Separadores entre items del acordeon: invisibles porque los items
+	   ya tienen un fondo gris claro que los separa visualmente. */
+	.information-texto hr {
+		margin: 0.2rem 0;
+		border: 0;
+		border-top: 0;
+	}
+
+	/* Imagen principal de la pagina */
+	.acordeon-hero-img {
+		width: 100%;
+		max-height: 320px;
+		object-fit: cover;
+		border-radius: 4px;
+		margin-bottom: 1.5rem;
+	}
+
+	/* Bloque inferior con boton de descarga (anexo) */
+	.acordeon-anexo-block {
+		margin: 2rem 0;
+		padding: 1rem;
+		background: #f7f9fc;
+		border-left: 4px solid #00529c;
+		border-radius: 4px;
+	}
+	.acordeon-anexo-block .btn {
+		background: #00529c;
+		color: #fff;
+		border: none;
+	}
+	.acordeon-anexo-block .btn:hover {
+		background: #114875;
+	}
+
+	/* Boton descargar adjunto dentro de un item */
+	.information-texto .btn-adjunto {
+		display: inline-block;
+		background: #00529c;
+		color: #fff;
+		font-size: 0.85rem;
+		padding: 0.4rem 0.85rem;
+		border-radius: 3px;
+		text-decoration: none;
+		margin-top: 0.5rem;
+	}
+	.information-texto .btn-adjunto:hover {
+		background: #114875;
+		color: #fff;
+		text-decoration: none;
+	}
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container my-4">
+<div class="acordeon-page-legacy">
 	<div class="row g-4">
-		<div class="col-lg-9">
-			<article class="acordeon-page">
+		<div class="col-lg-3 order-lg-1">
+			{% include 'core/_sidebar_legacy.html' %}
+		</div>
+		<div class="col-lg-9 order-lg-2">
+	<article class="acordeon-page">
 
-				<h1 class="mb-3">{{ pagina.titulo }}</h1>
+		<h1 class="page-title">{{ pagina.titulo }}</h1>
 
-				{% if pagina.imagen_principal %}
-				<img src="{{ pagina.imagen_principal.url }}" class="img-fluid rounded mb-4" alt="{{ pagina.titulo }}">
-				{% endif %}
+		{% if pagina.imagen_principal %}
+		<img src="{{ pagina.imagen_principal.url }}" class="acordeon-hero-img" alt="{{ pagina.titulo }}">
+		{% endif %}
 
-				{# Bloque 1: contenido superior + items desplegables del AcordeonPage #}
-				{% if acordeon.contenido_superior or acordeon_items %}
-				<section class="mb-4">
-					{% if acordeon.contenido_superior %}
-					<div class="acordeon-contenido-superior mb-3">
-						{{ acordeon.contenido_superior|safe }}
-					</div>
+		<div class="information-texto">
+
+			{# Bloque 1: contenido_superior (intro de seccion "PUBLICO GENERAL") + items #}
+			{% if acordeon.contenido_superior %}
+				{{ acordeon.contenido_superior|safe }}
+			{% endif %}
+
+			{% if acordeon_items %}
+				{% for item in acordeon_items %}
+				<h4 data-bs-toggle="collapse" data-bs-target="#col-pub-{{ item.legacy_id }}"
+				    aria-expanded="false" aria-controls="col-pub-{{ item.legacy_id }}">
+					+ {{ item.titulo }}
+				</h4>
+				<div id="col-pub-{{ item.legacy_id }}" class="collapse">
+					{% if item.contenido %}{{ item.contenido|safe }}{% endif %}
+					{% if item.adjunto %}
+					<p>
+						<a href="{{ item.adjunto.url }}" target="_blank" rel="noopener" class="btn-adjunto">
+							{{ item.titulo_adjunto|default:'Descargar adjunto' }}
+						</a>
+					</p>
 					{% endif %}
-
-					{% if acordeon_items %}
-					<div class="accordion" id="acordeon-publico-{{ pagina.legacy_id }}">
-						{% for item in acordeon_items %}
-						<div class="accordion-item">
-							<h2 class="accordion-header" id="heading-pub-{{ item.legacy_id }}">
-								<button class="accordion-button collapsed" type="button"
-								        data-bs-toggle="collapse"
-								        data-bs-target="#collapse-pub-{{ item.legacy_id }}"
-								        aria-expanded="false"
-								        aria-controls="collapse-pub-{{ item.legacy_id }}">
-									{{ item.titulo }}
-								</button>
-							</h2>
-							<div id="collapse-pub-{{ item.legacy_id }}"
-							     class="accordion-collapse collapse"
-							     aria-labelledby="heading-pub-{{ item.legacy_id }}"
-							     data-bs-parent="#acordeon-publico-{{ pagina.legacy_id }}">
-								<div class="accordion-body">
-									{% if item.contenido %}{{ item.contenido|safe }}{% endif %}
-									{% if item.adjunto %}
-									<a href="{{ item.adjunto.url }}" target="_blank" rel="noopener"
-									   class="btn btn-sm btn-primary mt-2">
-										{{ item.titulo_adjunto|default:'Descargar adjunto' }}
-									</a>
-									{% endif %}
-								</div>
-							</div>
-						</div>
-						{% endfor %}
-					</div>
-					{% endif %}
-				</section>
-				{% endif %}
-
-				{# Bloque 2: contenido del SiteTree legacy (HTML con sus propios acordeones BS5) #}
-				{% if pagina.contenido %}
-				<section class="acordeon-contenido-legacy mb-4">
-					{{ pagina.contenido|safe }}
-				</section>
-				{% endif %}
-
-				{# Bloque 3: contenido inferior + anexo #}
-				{% if acordeon.contenido_inferior %}
-				<section class="acordeon-contenido-inferior mb-3">
-					{{ acordeon.contenido_inferior|safe }}
-				</section>
-				{% endif %}
-
-				{% if acordeon.anexo %}
-				<div class="mb-4">
-					<a href="{{ acordeon.anexo.url }}" target="_blank" rel="noopener"
-					   class="btn btn-secondary">
-						{{ acordeon.titulo_anexo|default:'Descargar anexo' }}
-					</a>
 				</div>
-				{% endif %}
+				{% if not forloop.last %}<hr>{% endif %}
+				{% endfor %}
+			{% endif %}
 
-			</article>
+			{# Bloque 2: HTML del SiteTree legacy (secciones 2 y 3 con sus propios h4 + collapse) #}
+			{% if pagina.contenido %}
+				{{ pagina.contenido|safe }}
+			{% endif %}
+
+			{# Bloque 3: contenido inferior #}
+			{% if acordeon.contenido_inferior %}
+				{{ acordeon.contenido_inferior|safe }}
+			{% endif %}
+
 		</div>
 
-		<aside class="col-lg-3">
-			<div class="card p-3">
-				<h6 class="text-uppercase small fw-bold text-muted mb-2">Otras paginas</h6>
-				<div class="list-group list-group-flush">
-					{% for p in paginas_menu %}
-					<a href="{% url 'core:pagina_detalle' p.slug %}"
-					   class="list-group-item list-group-item-action px-2 {% if p.id == pagina.id %}active{% endif %}">
-						{{ p.titulo }}
-					</a>
-					{% empty %}
-					<span class="text-muted small">Sin paginas de menu.</span>
-					{% endfor %}
-				</div>
-			</div>
-		</aside>
+		{% if acordeon.anexo %}
+		<div class="acordeon-anexo-block">
+			<a href="{{ acordeon.anexo.url }}" target="_blank" rel="noopener" class="btn">
+				<i class="fas fa-download me-1"></i>
+				{{ acordeon.titulo_anexo|default:'Descargar anexo' }}
+			</a>
+		</div>
+		{% endif %}
+
+	</article>
+		</div>
 	</div>
 </div>
 {% endblock %}

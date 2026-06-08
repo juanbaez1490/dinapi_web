@@ -1,0 +1,96 @@
+{% comment %}
+Paginacion estandar con numeros de pagina visibles, ellipsis y nav flechas.
+
+Uso:
+    {% include 'core/_pagination.html' %}
+
+Contexto esperado (Django ListView lo provee por default):
+  - is_paginated
+  - page_obj (Paginator's Page)
+  - request (context_processors.request)
+
+La query string actual se preserva (excepto el parametro `page`).
+{% endcomment %}
+
+{% if is_paginated %}
+{% with page_obj.paginator as p %}
+<nav aria-label="Paginacion" class="dinapi-pagination-nav mt-4">
+	<ul class="pagination justify-content-center flex-wrap mb-0">
+
+		{# Boton "Anterior" #}
+		<li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
+			{% if page_obj.has_previous %}
+				<a class="page-link" href="?{% for k,v in request.GET.items %}{% if k != 'page' %}{{ k }}={{ v }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}" aria-label="Anterior">
+					<i class="fas fa-chevron-left"></i>
+				</a>
+			{% else %}
+				<span class="page-link"><i class="fas fa-chevron-left"></i></span>
+			{% endif %}
+		</li>
+
+		{# Numeros de pagina con ellipsis #}
+		{% for num in p.page_range %}
+			{% if num == page_obj.number %}
+				<li class="page-item active" aria-current="page">
+					<span class="page-link">{{ num }}</span>
+				</li>
+			{% elif num == 1 or num == p.num_pages or num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
+				<li class="page-item">
+					<a class="page-link" href="?{% for k,v in request.GET.items %}{% if k != 'page' %}{{ k }}={{ v }}&{% endif %}{% endfor %}page={{ num }}">{{ num }}</a>
+				</li>
+			{% elif num == page_obj.number|add:'-3' or num == page_obj.number|add:'3' %}
+				<li class="page-item disabled"><span class="page-link">…</span></li>
+			{% endif %}
+		{% endfor %}
+
+		{# Boton "Siguiente" #}
+		<li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
+			{% if page_obj.has_next %}
+				<a class="page-link" href="?{% for k,v in request.GET.items %}{% if k != 'page' %}{{ k }}={{ v }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}" aria-label="Siguiente">
+					<i class="fas fa-chevron-right"></i>
+				</a>
+			{% else %}
+				<span class="page-link"><i class="fas fa-chevron-right"></i></span>
+			{% endif %}
+		</li>
+
+	</ul>
+	<p class="text-center text-muted small mt-2 mb-0">
+		Página {{ page_obj.number }} de {{ p.num_pages }} &middot; {{ p.count }} resultado{{ p.count|pluralize }}
+	</p>
+</nav>
+{% endwith %}
+
+<style>
+	.dinapi-pagination-nav .pagination {
+		--bs-pagination-color: var(--dinapi-blue, #00529c);
+		--bs-pagination-bg: #fff;
+		--bs-pagination-border-color: #d8dde5;
+		--bs-pagination-hover-color: #fff;
+		--bs-pagination-hover-bg: var(--dinapi-blue, #00529c);
+		--bs-pagination-hover-border-color: var(--dinapi-blue, #00529c);
+		--bs-pagination-focus-box-shadow: 0 0 0 0.2rem rgba(0, 82, 156, 0.18);
+		--bs-pagination-active-color: #fff;
+		--bs-pagination-active-bg: var(--dinapi-blue, #00529c);
+		--bs-pagination-active-border-color: var(--dinapi-blue, #00529c);
+		--bs-pagination-disabled-color: #9aa3ad;
+		--bs-pagination-disabled-bg: #fff;
+		--bs-pagination-disabled-border-color: #e6e9ee;
+		gap: 0.2rem;
+	}
+	.dinapi-pagination-nav .page-link {
+		min-width: 38px;
+		text-align: center;
+		font-size: 0.88rem;
+		font-weight: 600;
+		padding: 0.4rem 0.7rem;
+		border-radius: 4px !important;
+	}
+	.dinapi-pagination-nav .page-item.active .page-link {
+		box-shadow: 0 1px 3px rgba(0, 82, 156, 0.25);
+	}
+	.dinapi-pagination-nav .page-item.disabled .page-link {
+		background: #f7f9fc;
+	}
+</style>
+{% endif %}

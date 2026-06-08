@@ -1,6 +1,58 @@
 from django.db import models
 
 
+class MenuPrincipal(models.Model):
+	"""
+	Items del navbar principal (lado izquierdo).
+	A diferencia del menu auto-construido desde core.Pagina jerarquica, este es
+	un menu CURADO que reproduce exactamente la estructura del legacy DINAPI.
+
+	Estructura: items con padre opcional (FK self). Si padre IS NULL es item
+	de primer nivel. Si tiene padre, aparece como sub-item del desplegable.
+
+	URLs: se resuelven en orden:
+	  1. Si link_externo esta seteado -> usarlo.
+	  2. Si pagina_destino_legacy_id apunta a una Pagina activa -> resolver.
+	  3. Si link_interno_url esta seteado -> usarlo tal cual.
+	  4. Fallback: '#'.
+	"""
+	titulo = models.CharField(max_length=255)
+	padre = models.ForeignKey(
+		'self', null=True, blank=True,
+		on_delete=models.CASCADE, related_name='hijos',
+		help_text='Si tiene padre, este item aparece como sub-item del desplegable.',
+	)
+	orden = models.PositiveIntegerField(
+		default=0, help_text='Menor numero = aparece primero.',
+	)
+	pagina_destino_legacy_id = models.PositiveIntegerField(
+		null=True, blank=True,
+		help_text='legacy_id de la Pagina destino (resuelve la URL dinamicamente).',
+	)
+	link_interno_url = models.CharField(
+		max_length=500, blank=True, default='',
+		help_text='URL interna explicita (alternativa a pagina_destino_legacy_id).',
+	)
+	link_externo = models.CharField(
+		max_length=500, blank=True, default='',
+		help_text='URL externa absoluta. Si esta poblada, prevalece sobre las internas.',
+	)
+	target_blank = models.BooleanField(
+		default=False,
+		help_text='Abrir en pestana nueva. Recomendado para link externo.',
+	)
+	activo = models.BooleanField(default=True)
+
+	class Meta:
+		verbose_name = 'Item del menu principal'
+		verbose_name_plural = 'Menu principal (curado)'
+		ordering = ['orden', 'id']
+
+	def __str__(self):
+		prefijo = '  └ ' if self.padre_id else ''
+		return f'{prefijo}{self.titulo}'
+
+
 class MenuDerecho(models.Model):
 	"""Equivalente Django de MenuDerecho en SilverStripe."""
 

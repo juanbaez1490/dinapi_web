@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Boletines - DINAPI{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+	<h1 class="mb-4">Boletines</h1>
+	<p class="text-muted mb-4">Elegí qué tipo de boletines querés consultar.</p>
+
+	<div class="row g-4">
+		<div class="col-md-6">
+			<a href="{% url 'boletines:patentes' %}" class="text-decoration-none">
+				<div class="card h-100 shadow-sm border-0">
+					<div class="card-body">
+						<div class="d-flex align-items-center gap-3 mb-2">
+							<i class="fas fa-cogs fa-2x text-primary"></i>
+							<h2 class="h4 mb-0">Boletines de Patentes</h2>
+						</div>
+						<p class="text-muted mb-2">
+							Boletines de Patentes de Invenciones, Modelos de Utilidad y Diseños Industriales.
+						</p>
+						<span class="badge bg-light text-dark">{{ count_patentes }} períodos publicados</span>
+					</div>
+				</div>
+			</a>
+		</div>
+
+		<div class="col-md-6">
+			<a href="{% url 'boletines:marcas' %}" class="text-decoration-none">
+				<div class="card h-100 shadow-sm border-0">
+					<div class="card-body">
+						<div class="d-flex align-items-center gap-3 mb-2">
+							<i class="fas fa-tag fa-2x text-danger"></i>
+							<h2 class="h4 mb-0">Boletines de Marcas</h2>
+						</div>
+						<p class="text-muted mb-2">
+							Boletines de Marcas y Documentos, Logotipos, Actos Jurídicos y Movimientos Administrativos.
+						</p>
+						<span class="badge bg-light text-dark">{{ count_marcas }} períodos publicados</span>
+					</div>
+				</div>
+			</a>
+		</div>
+	</div>
+</div>
+{% endblock %}

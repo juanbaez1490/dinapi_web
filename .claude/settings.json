@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl *)",
+      "Bash(netstat *)",
+      "Bash(taskkill *)",
+      "Bash(mkdir *)",
+      "Bash(python manage.py check)",
+      "Bash(python manage.py check *)",
+      "Bash(python manage.py runserver *)",
+      "Bash(python manage.py validate_migration *)",
+      "mcp__ccd_session__mark_chapter"
+    ]
+  }
+}
