@@ -13,69 +13,29 @@
         margin: 0 auto;
         padding: 0 0.9rem;
     }
-    /* sidebar */
-    .sidebar-links h1 {
-        font-size: 1.4rem;
-        font-weight: 700;
-        color: var(--dinapi-blue-deep);
-        margin-bottom: 0.9rem;
-    }
-    .sidebar-links .infodinapi-img {
-        width: 100%;
-        border-radius: 4px;
-        box-shadow: 0 4px 12px rgba(0,0,0,.15);
-    }
-    .sidebar-links .btn-download {
-        background-color: var(--dinapi-blue);
-        color: #fff;
-        font-size: 0.85rem;
-        padding: 0.4rem 0.8rem;
-        border-radius: 4px;
-        text-decoration: none;
-        display: inline-block;
-        margin-top: 0.7rem;
-    }
-    .sidebar-links .btn-download:hover { background-color: var(--dinapi-blue-deep); color:#fff; }
-    .sidebar-cat-title {
-        font-size: 0.78rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: .04em;
-        color: #777;
-        margin: 1.2rem 0 0.4rem;
-    }
-    .sidebar-cat-list { list-style: none; margin: 0; padding: 0; }
-    .sidebar-cat-list li { border-bottom: 1px solid #e4e4e4; }
-    .sidebar-cat-list a {
-        display: block;
-        padding: 0.42rem 0.1rem;
-        font-size: 0.82rem;
-        color: #2d4057;
-        text-decoration: none;
-    }
-    .sidebar-cat-list a:hover { color: var(--dinapi-blue); }
-    .sidebar-cat-list a.active { color: var(--dinapi-red); font-weight: 600; }
-    /* search bar */
-    .noticias-search-form {
-        display: flex;
-        gap: 0.4rem;
-        margin-bottom: 1.1rem;
-    }
-    .noticias-search-form .form-control {
+    /* (sidebar styles vienen del partial core/_sidebar_legacy.html) */
+    /* Buscador: layout pill con btn-light personalizado */
+    .noticias-search-bar { max-width: 540px; margin-bottom: 1.4rem; }
+    .noticias-search-bar .input-group { gap: 0.5rem; }
+    .noticias-search-bar .form-control {
         border-radius: 999px;
-        font-size: 0.83rem;
-        padding: 0.38rem 0.9rem;
+        padding: 0.5rem 1rem;
     }
-    .noticias-search-form .btn {
+    .noticias-search-bar .btn-buscar {
+        background: #e9ecef;
+        color: #1d2530;
+        border: 1px solid #d8dde5;
         border-radius: 999px;
-        font-size: 0.82rem;
-        background: var(--dinapi-blue);
-        color: #fff;
-        border: 0;
-        padding: 0.38rem 0.85rem;
-        white-space: nowrap;
+        padding: 0.5rem 1.2rem;
+        font-weight: 500;
+        transition: background .15s, color .15s;
     }
-    .noticias-search-form .btn:hover { background: var(--dinapi-blue-deep); }
+    .noticias-search-bar .btn-buscar:hover,
+    .noticias-search-bar .btn-buscar:focus {
+        background: #d8dde5;
+        color: #1d2530;
+        border-color: #c7ccd3;
+    }
     /* cards */
     .noticia-card {
         border: 0;
@@ -84,7 +44,9 @@
         box-shadow: 0 2px 8px rgba(0,0,0,.10);
         transition: transform .22s ease, box-shadow .22s ease;
         height: 100%;
+        cursor: pointer;
     }
+    .noticia-card .stretched-link:focus { outline: none; }
     .noticia-card:hover {
         transform: translateY(-4px);
         box-shadow: 0 8px 22px rgba(0,0,0,.14);
@@ -165,60 +127,34 @@
     <div class="container page-container">
         <div class="row" id="information-container">
 
-            <!-- Sidebar -->
-            <div class="col-md-3 sidebar-links px-3 px-md-4 mb-4">
-                <h1>Centro de Noticias</h1>
-                {% if ultimo_boletin and ultimo_boletin.imagen %}
-                <img
-                    src="{{ ultimo_boletin.imagen.url }}"
-                    class="infodinapi-img img-fluid"
-                    alt="INFODINAPI">
-                {% endif %}
-                {% if ultimo_boletin and ultimo_boletin.pdf %}
-                <a href="{{ ultimo_boletin.pdf.url }}"
-                   target="_blank" rel="noopener" class="btn-download">
-                    Descargar INFODINAPI
-                </a>
-                {% endif %}
-
-                <p class="sidebar-cat-title">Filtrar por categoría</p>
-                <ul class="sidebar-cat-list">
-                    <li>
-                        <a href="{% url 'noticias:lista' %}"
-                           class="{% if not request.GET.categoria %}active{% endif %}">
-                            Todas las noticias
-                        </a>
-                    </li>
-                    {% for categoria in categorias %}
-                    <li>
-                        <a href="?categoria={{ categoria.slug }}"
-                           class="{% if request.GET.categoria == categoria.slug %}active{% endif %}">
-                            {{ categoria.nombre }}
-                        </a>
-                    </li>
-                    {% endfor %}
-                </ul>
+            <!-- Sidebar: solo InfoDINAPI mas reciente -->
+            <div class="col-md-3 mb-4">
+                {% include 'core/_sidebar_legacy.html' with show_noticias_destacadas=False %}
             </div>
 
             <!-- Contenido -->
             <div class="col-md-9 information-texto">
 
                 <!-- Buscador -->
-                <form method="get" class="noticias-search-form">
+                <form method="get" class="noticias-search-bar">
                     {% if request.GET.categoria %}
                     <input type="hidden" name="categoria" value="{{ request.GET.categoria }}">
                     {% endif %}
-                    <input type="text" name="q" class="form-control"
-                           placeholder="Buscar noticias…"
-                           value="{{ request.GET.q|default:'' }}">
-                    <button type="submit"><i class="fas fa-search"></i> Buscar</button>
+                    <div class="input-group">
+                        <input type="text" name="q" class="form-control"
+                               placeholder="Buscar noticias…"
+                               value="{{ request.GET.q|default:'' }}">
+                        <button type="submit" class="btn btn-buscar">
+                            <i class="fas fa-search me-1"></i> Buscar
+                        </button>
+                    </div>
                 </form>
 
                 {% if noticias %}
                 <div class="row g-3">
                     {% for noticia in noticias %}
                     <div class="col-sm-12 col-md-6 col-lg-4 mb-3">
-                        <div class="card noticia-card">
+                        <div class="card noticia-card position-relative">
                             {% if noticia.imagen %}
                                 <img class="card-img-top" src="{{ noticia.imagen.url }}" alt="{{ noticia.titulo }}">
                             {% else %}
@@ -230,11 +166,13 @@
                                 <p class="date-noticia">{{ noticia.fecha|date:'d-m-Y' }}</p>
                                 {% if noticia.destacado %}<span class="badge-destacado"><i class="fas fa-star"></i> Destacada</span>{% endif %}
                                 <span class="badge-cat">{{ noticia.categoria.nombre }}</span>
-                                <h4>{{ noticia.titulo }}</h4>
+                                <h4>
+                                    <a href="{% url 'noticias:detalle' noticia.slug %}" class="stretched-link text-reset text-decoration-none">
+                                        {{ noticia.titulo }}
+                                    </a>
+                                </h4>
                                 <p class="card-text">{{ noticia.get_epigrafe|truncatechars:120 }}…</p>
-                                <a href="{% url 'noticias:detalle' noticia.slug %}" class="btn btn-ver-mas">
-                                    Ver más
-                                </a>
+                                <span class="btn btn-ver-mas">Ver más</span>
                             </div>
                         </div>
                     </div>

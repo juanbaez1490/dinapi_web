@@ -101,6 +101,7 @@
 {% endif %}
 
 <div class="container">
+	{% include 'core/_breadcrumbs.html' %}
 	{% if pagina.contenido %}
 	<div class="mb-4">{{ pagina.contenido|safe }}</div>
 	{% endif %}

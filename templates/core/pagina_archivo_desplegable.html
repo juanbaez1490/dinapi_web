@@ -10,6 +10,7 @@
 			{% include 'core/_sidebar_legacy.html' %}
 		</div>
 		<div class="col-lg-9 order-lg-2">
+	{% include 'core/_breadcrumbs.html' %}
 	<article class="archivo-desplegable-page">
 
 		<h1 class="mb-1">{{ pagina.titulo }}</h1>
@@ -55,14 +56,46 @@
 						     aria-labelledby="head-arch-{{ sub.legacy_id }}"
 						     data-bs-parent="#acordeon-archivo-{{ pagina.legacy_id }}">
 							<div class="accordion-body p-2">
-								{% with lista=archivos_por_subpagina|get_item:sub.id %}
+								{% with lista=archivos_por_subpagina|get_item:sub.id nietos=subsubpaginas_por_subpagina|get_item:sub.id %}
 								{% if lista %}
-								<ul class="list-group list-group-flush">
+								<ul class="list-group list-group-flush mb-3">
 									{% for archivo in lista %}
 										{% include 'core/_archivo_item.html' with archivo=archivo %}
 									{% endfor %}
 								</ul>
-								{% else %}
+								{% endif %}
+
+								{# Sub-sub-secciones (nietos) como acordeon anidado #}
+								{% if nietos %}
+								<div class="accordion accordion-flush" id="acord-sub-{{ sub.legacy_id }}">
+									{% for nieto_item in nietos %}
+									<div class="accordion-item">
+										<h2 class="accordion-header" id="head-sub-{{ nieto_item.pagina.legacy_id }}">
+											<button class="accordion-button collapsed" type="button"
+											        data-bs-toggle="collapse"
+											        data-bs-target="#col-sub-{{ nieto_item.pagina.legacy_id }}"
+											        aria-expanded="false">
+												{{ nieto_item.pagina.titulo }}
+												<span class="badge bg-light text-dark ms-2">{{ nieto_item.archivos|length }}</span>
+											</button>
+										</h2>
+										<div id="col-sub-{{ nieto_item.pagina.legacy_id }}"
+										     class="accordion-collapse collapse"
+										     data-bs-parent="#acord-sub-{{ sub.legacy_id }}">
+											<div class="accordion-body p-2">
+												<ul class="list-group list-group-flush">
+													{% for archivo in nieto_item.archivos %}
+														{% include 'core/_archivo_item.html' with archivo=archivo %}
+													{% endfor %}
+												</ul>
+											</div>
+										</div>
+									</div>
+									{% endfor %}
+								</div>
+								{% endif %}
+
+								{% if not lista and not nietos %}
 								<p class="text-muted small mb-0">Sin archivos en esta sección.</p>
 								{% endif %}
 								{% endwith %}
