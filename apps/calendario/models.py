@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from django_ckeditor_5.fields import CKEditor5Field
 
 
 class Actividad(models.Model):
@@ -9,7 +10,7 @@ class Actividad(models.Model):
     y se filtran por mes/año en la vista.
     """
     titulo = models.CharField(max_length=255, verbose_name='Título')
-    descripcion = models.TextField(blank=True, verbose_name='Descripción')
+    descripcion = CKEditor5Field(blank=True, verbose_name='Descripción', config_name='default')
     fecha_inicio = models.DateTimeField(verbose_name='Fecha y hora de inicio')
     fecha_fin = models.DateTimeField(null=True, blank=True, verbose_name='Fecha y hora de fin')
     lugar = models.CharField(max_length=255, blank=True, verbose_name='Lugar')

@@ -1,4 +1,5 @@
 from django.db import models
+from django_ckeditor_5.fields import CKEditor5Field
 
 
 class TarjetaPage(models.Model):
@@ -81,8 +82,8 @@ class AcordeonPage(models.Model):
 	legacy_id = models.PositiveIntegerField(unique=True)
 	titulo_padre = models.CharField(max_length=350, blank=True)
 	titulo_anexo = models.CharField(max_length=350, blank=True)
-	contenido_superior = models.TextField(blank=True)
-	contenido_inferior = models.TextField(blank=True)
+	contenido_superior = CKEditor5Field(blank=True, config_name='extended')
+	contenido_inferior = CKEditor5Field(blank=True, config_name='extended')
 	imagen = models.ImageField(upload_to='acordeon/imagenes-pagina/', null=True, blank=True)
 	anexo = models.FileField(upload_to='acordeon/archivos-anexos/', null=True, blank=True)
 
@@ -105,7 +106,7 @@ class AcordeonItem(models.Model):
 		related_name='desplegables',
 	)
 	titulo = models.CharField(max_length=350)
-	contenido = models.TextField(blank=True)
+	contenido = CKEditor5Field(blank=True, config_name='extended')
 	titulo_adjunto = models.CharField(max_length=350, blank=True)
 	adjunto = models.FileField(upload_to='acordeon/archivos-adjuntos/', null=True, blank=True)
 	fecha_ordenamiento = models.DateField(null=True, blank=True)

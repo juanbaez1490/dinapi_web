@@ -1,12 +1,13 @@
 from django.db import models
 from django.utils import timezone
 from django.utils.html import strip_tags
+from django_ckeditor_5.fields import CKEditor5Field
 
 class CategoriaNoticia(models.Model):
     """Categoría de noticias"""
     nombre = models.CharField(max_length=255, unique=True)
     slug = models.SlugField(unique=True)
-    descripcion = models.TextField(blank=True)
+    descripcion = CKEditor5Field(blank=True, config_name='basic')
     
     class Meta:
         verbose_name = 'Categoría de Noticia'
@@ -23,7 +24,7 @@ class Noticia(models.Model):
     slug = models.SlugField(unique=True, max_length=255)
     categoria = models.ForeignKey(CategoriaNoticia, on_delete=models.PROTECT, related_name='noticias')
     fecha = models.DateField(default=timezone.now)
-    contenido = models.TextField(help_text='Contenido HTML de la noticia')
+    contenido = CKEditor5Field(help_text='Contenido HTML de la noticia', config_name='extended')
     imagen = models.ImageField(upload_to='noticias/imagenes-noticias/', null=True, blank=True)
     
     # Campos de control
@@ -58,7 +59,7 @@ class RevistaPage(models.Model):
     """Página/sección de revista (para gestionar revistas)"""
     titulo = models.CharField(max_length=255)
     slug = models.SlugField(unique=True)
-    descripcion = models.TextField(blank=True)
+    descripcion = CKEditor5Field(blank=True, config_name='default')
     imagen = models.ImageField(upload_to='revistas/', null=True, blank=True)
     activo = models.BooleanField(default=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)

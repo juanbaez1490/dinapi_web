@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.html import strip_tags
 from django.utils.text import slugify
+from django_ckeditor_5.fields import CKEditor5Field
 
 
 class CategoriaBiblioteca(models.Model):
@@ -40,7 +41,7 @@ class VideoBiblioteca(models.Model):
     """Video embebido (YouTube, Vimeo u otro) asociado a un recurso de biblioteca."""
     titulo = models.CharField(max_length=255)
     url = models.URLField(max_length=500, help_text='URL de embed o enlace directo al video.')
-    descripcion = models.TextField(blank=True)
+    descripcion = CKEditor5Field(blank=True, config_name='basic')
     orden = models.PositiveIntegerField(default=0)
     legacy_id = models.PositiveIntegerField(unique=True, null=True, blank=True)
 
@@ -61,7 +62,7 @@ class ImagenBiblioteca(models.Model):
         null=True, blank=True,
     )
     url = models.URLField(max_length=500, blank=True, help_text='URL externa si la imagen no esta subida.')
-    descripcion = models.TextField(blank=True)
+    descripcion = CKEditor5Field(blank=True, config_name='basic')
     orden = models.PositiveIntegerField(default=0)
     legacy_id = models.PositiveIntegerField(unique=True, null=True, blank=True)
 
@@ -87,7 +88,7 @@ class DocumentoBiblioteca(models.Model):
         null=True, blank=True,
     )
     url = models.URLField(max_length=500, blank=True, help_text='URL externa si el archivo no esta subido.')
-    descripcion = models.TextField(blank=True)
+    descripcion = CKEditor5Field(blank=True, config_name='basic')
     orden = models.PositiveIntegerField(default=0)
     legacy_id = models.PositiveIntegerField(unique=True, null=True, blank=True)
 
@@ -116,11 +117,11 @@ class Biblioteca(models.Model):
         related_name='items',
     )
 
-    descripcion = models.TextField(blank=True)
+    descripcion = CKEditor5Field(blank=True, config_name='extended')
     descripcion_videos = models.CharField(max_length=500, blank=True)
     descripcion_imagenes = models.CharField(max_length=500, blank=True)
     descripcion_documentos = models.CharField(max_length=500, blank=True)
-    enlaces_referencias = models.TextField(blank=True)
+    enlaces_referencias = CKEditor5Field(blank=True, config_name='default')
     imagen_principal = models.ImageField(
         upload_to='biblioteca/imagenes-principales/', null=True, blank=True,
     )
