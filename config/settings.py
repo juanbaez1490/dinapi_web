@@ -23,6 +23,7 @@ INSTALLED_APPS = [
     # Third party
     'crispy_forms',
     'crispy_bootstrap5',
+    'django_ckeditor_5',
 
     # Local apps
     'apps.core',
@@ -128,3 +129,80 @@ EMAIL_USE_SSL = config('EMAIL_USE_SSL', default=True, cast=bool)
 EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='noreply@dinapi.gov.py')
+
+
+# ─── CKEDITOR 5 ──────────────────────────────────────────────────────────────
+# Editor WYSIWYG para campos HTML del admin. Dos perfiles:
+#   - 'extended': para contenido HTML rico (Pagina, Noticia, AcordeonItem, etc.)
+#                 con tablas, imágenes y soporte completo de HTML legacy
+#                 (data-bs-toggle, clases custom, atributos data-*).
+#   - 'basic':    para descripciones cortas (categorías, etiquetas, etc.)
+CKEDITOR_5_ALLOW_ALL_FILE_TYPES = False
+CKEDITOR_5_UPLOAD_FILE_TYPES = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'pdf']
+
+# Permitir TODO el HTML legacy sin sanitizar (data-*, classes, styles).
+# Imprescindible para preservar acordeones Bootstrap 5 migrados.
+_CKE_FULL_HTML_SUPPORT = {
+    'allow': [
+        {
+            'name': '/.*/',
+            'attributes': True,
+            'classes': True,
+            'styles': True,
+        }
+    ]
+}
+
+CKEDITOR_5_CONFIGS = {
+    'default': {
+        'toolbar': [
+            'heading', '|',
+            'bold', 'italic', 'underline', 'link', '|',
+            'bulletedList', 'numberedList', '|',
+            'blockQuote', '|',
+            'removeFormat', 'undo', 'redo',
+        ],
+        'language': 'es',
+    },
+    'basic': {
+        'toolbar': [
+            'bold', 'italic', 'link', '|',
+            'bulletedList', 'numberedList', '|',
+            'removeFormat', 'undo', 'redo',
+        ],
+        'language': 'es',
+    },
+    'extended': {
+        'toolbar': [
+            'heading', '|',
+            'bold', 'italic', 'underline', 'strikethrough', 'link', '|',
+            'bulletedList', 'numberedList', 'outdent', 'indent', '|',
+            'imageUpload', 'mediaEmbed', 'insertTable', 'blockQuote', '|',
+            'horizontalLine', 'specialCharacters', 'removeFormat', '|',
+            'sourceEditing', 'undo', 'redo',
+        ],
+        'language': 'es',
+        'image': {
+            'toolbar': ['imageTextAlternative', '|', 'imageStyle:alignLeft',
+                        'imageStyle:alignRight', 'imageStyle:alignCenter',
+                        'imageStyle:side', '|'],
+            'styles': ['full', 'side', 'alignLeft', 'alignRight', 'alignCenter'],
+        },
+        'table': {
+            'contentToolbar': ['tableColumn', 'tableRow', 'mergeTableCells',
+                               'tableProperties', 'tableCellProperties'],
+        },
+        'heading': {
+            'options': [
+                {'model': 'paragraph', 'title': 'Parrafo', 'class': 'ck-heading_paragraph'},
+                {'model': 'heading2', 'view': 'h2', 'title': 'Titulo 2', 'class': 'ck-heading_heading2'},
+                {'model': 'heading3', 'view': 'h3', 'title': 'Titulo 3', 'class': 'ck-heading_heading3'},
+                {'model': 'heading4', 'view': 'h4', 'title': 'Titulo 4', 'class': 'ck-heading_heading4'},
+            ]
+        },
+        # CRITICO: preserva todo el HTML legacy (acordeones BS5, data-*, clases).
+        'htmlSupport': _CKE_FULL_HTML_SUPPORT,
+    },
+}
+
+# Subida de archivos del editor: usa el storage por default (media/).

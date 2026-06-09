@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from django_ckeditor_5.fields import CKEditor5Field
 
 
 class SiteConfig(models.Model):
@@ -10,7 +11,7 @@ class SiteConfig(models.Model):
     telefono = models.CharField(max_length=50, blank=True)
     direccion = models.CharField(max_length=500, blank=True)
     logo = models.ImageField(upload_to='configuracion/', null=True, blank=True)
-    descripcion = models.TextField(blank=True)
+    descripcion = CKEditor5Field(blank=True, config_name='basic')
 
     # URLs configurables del footer
     url_horarios = models.URLField(
@@ -44,7 +45,7 @@ class BasePage(models.Model):
     """Modelo base para todas las paginas"""
     titulo = models.CharField(max_length=255)
     slug = models.SlugField(unique=True, max_length=255)
-    contenido = models.TextField(blank=True)
+    contenido = CKEditor5Field(blank=True, config_name='extended')
     descripcion = models.CharField(max_length=500, blank=True, help_text='Para SEO')
     imagen_principal = models.ImageField(upload_to='paginas/', null=True, blank=True)
 
@@ -198,7 +199,7 @@ class Anuncio(models.Model):
     Permite activación/desactivación por fecha.
     """
     titulo = models.CharField(max_length=255, verbose_name='Título')
-    descripcion = models.TextField(blank=True, verbose_name='Descripción')
+    descripcion = CKEditor5Field(blank=True, verbose_name='Descripción', config_name='default')
     imagen = models.ImageField(
         upload_to='home/anuncios/%Y/%m/',
         null=True, blank=True,

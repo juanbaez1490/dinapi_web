@@ -14,6 +14,9 @@ dj-database-url>=2.2
 # Manejo de imágenes
 Pillow>=10.4.0
 
+# Editor WYSIWYG (CKEditor 5) para campos HTML del admin
+django-ckeditor-5>=0.2.20
+
 # Drivers de base de datos (descomentar según el entorno de producción)
 # mysqlclient>=2.2          # MySQL / MariaDB
 # psycopg2-binary>=2.9      # PostgreSQL
